@@ -1,0 +1,183 @@
+package com.ndhzs.netlayout.view
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Canvas
+import android.os.Parcel
+import android.os.Parcelable
+import android.util.ArrayMap
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import com.ndhzs.netlayout.R
+import com.ndhzs.netlayout.child.IChildListener
+import com.ndhzs.netlayout.child.IChildListenerProvider
+import com.ndhzs.netlayout.draw.ItemDecoration
+import com.ndhzs.netlayout.touch.OnItemTouchListener
+import com.ndhzs.netlayout.touch.TouchDispatcher
+import com.ndhzs.netlayout.save.OnSaveStateListener
+import com.ndhzs.netlayout.draw.ItemDecorationProvider
+import com.ndhzs.netlayout.save.SaveStateProvider
+import com.ndhzs.netlayout.touch.ItemTouchProvider
+
+/**
+ * 专门用于提供一些分发扩展的 ViewGroup
+ *
+ * - 可扩展事件分发
+ * - 提供绘图的分发
+ * - 提供在试图被摧毁时保存数据的接口
+ *
+ * 因为提供了扩展，所以部分方法不允许重写
+ *
+ * @author 985892345 (Guo Xiangrui)
+ * @email 2767465918@qq.com
+ * @date 2022/3/7 16:16
+ */
+open class NetLayout2 @JvmOverloads constructor(
+  context: Context,
+  attrs: AttributeSet? = null,
+  defStyleAttr: Int = R.attr.netLayoutStyle,
+  defStyleRes: Int = 0
+) : NetLayout(context, attrs, defStyleAttr, defStyleRes),
+  ItemDecorationProvider, ItemTouchProvider, SaveStateProvider, IChildListenerProvider {
+  
+  final override fun addItemDecoration(decor: ItemDecoration) {
+    mItemDecoration.add(mItemDecoration.size, decor)
+  }
+  
+  final override fun addItemDecoration(decor: ItemDecoration, index: Int) {
+    mItemDecoration.add(index, decor)
+  }
+  
+  final override fun addItemTouchListener(l: OnItemTouchListener) {
+    mTouchDispatchHelper.addItemTouchListener(l)
+  }
+  
+  final override fun addSaveStateListener(tag: String, l: OnSaveStateListener) {
+    val bundle = mSaveBundleListenerCache[tag]
+    if (bundle != null) {
+      // 如果有之前保留的数据，意思是设置监听前就得到了保留的数据
+      l.onRestoreState(bundle)
+      mSaveBundleListenerCache.remove(tag)
+    }
+    mSaveBundleListeners[tag] = l
+  }
+  
+  final override fun addChildListener(l: IChildListener) {
+    mChildListener.add(l)
+  }
+  
+  final override fun addChildListener(l: IChildListener, index: Int) {
+    mChildListener.add(index, l)
+  }
+  
+  // 自定义绘图的监听
+  private val mItemDecoration = ArrayList<ItemDecoration>(5)
+  
+  // 自定义事件分发帮助类
+  private val mTouchDispatchHelper = TouchDispatcher()
+  
+  // 在 View 被摧毁时需要保存必要信息的监听
+  private val mSaveBundleListeners = ArrayMap<String, OnSaveStateListener>(3)
+  
+  // 添加或删除子 View 时的监听
+  private val mChildListener = ArrayList<IChildListener>(1)
+  
+  final override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+    mTouchDispatchHelper.dispatchTouchEvent(ev, this)
+    return super.dispatchTouchEvent(ev)
+  }
+  
+  final override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+    return mTouchDispatchHelper.onInterceptTouchEvent(ev, this)
+  }
+  
+  @SuppressLint("ClickableViewAccessibility")
+  final override fun onTouchEvent(event: MotionEvent): Boolean {
+    return mTouchDispatchHelper.onTouchEvent(event, this)
+  }
+  
+  final override fun dispatchDraw(canvas: Canvas) {
+    mItemDecoration.forEach {
+      it.onDrawBelow(canvas, this)
+    }
+    super.dispatchDraw(canvas)
+    mItemDecoration.forEach {
+      it.onDrawAbove(canvas, this)
+    }
+  }
+  
+  // 如果没有设置监听，就暂时保存
+  private val mSaveBundleListenerCache = ArrayMap<String, Parcelable?>(3)
+  
+  final override fun onRestoreInstanceState(state: Parcelable) {
+    if (state !is NetSavedState) {
+      super.onRestoreInstanceState(state)
+      return
+    }
+    super.onRestoreInstanceState(state.superState)
+    mSaveBundleListenerCache.clear()
+    // 再恢复 mSaveBundleListeners 的状态
+    state.saveBundleListeners.forEach {
+      val listener = mSaveBundleListeners[it.key]
+      if (listener != null) {
+        listener.onRestoreState(it.value)
+      } else {
+        mSaveBundleListenerCache[it.key] = it.value
+      }
+    }
+  }
+  
+  final override fun onSaveInstanceState(): Parcelable {
+    val superState = super.onSaveInstanceState()
+    val ss = NetSavedState(superState)
+    // 保存 mSaveBundleListeners 的状态
+    mSaveBundleListeners.forEach {
+      ss.saveBundleListeners[it.key] = it.value.onSaveState()
+    }
+    return ss
+  }
+  
+  /**
+   * 用于在布局被摧毁时保存必要的信息
+   */
+  open class NetSavedState : BaseSavedState {
+    val saveBundleListeners: ArrayMap<String, Parcelable?> = ArrayMap() // 保存的 mSaveBundleListeners 的信息
+    
+    constructor(superState: Parcelable?) : super(superState)
+    
+    @SuppressLint("ParcelClassLoader")
+    constructor(source: Parcel) : super(source) {
+      source.readMap(saveBundleListeners, null)
+    }
+    
+    override fun writeToParcel(out: Parcel, flags: Int) {
+      super.writeToParcel(out, flags)
+      out.writeMap(saveBundleListeners)
+    }
+    
+    companion object CREATOR : Parcelable.Creator<NetSavedState> {
+      override fun createFromParcel(source: Parcel): NetSavedState {
+        return NetSavedState(source)
+      }
+      
+      override fun newArray(size: Int): Array<NetSavedState?> {
+        return arrayOfNulls(size)
+      }
+    }
+  }
+  
+  override fun onViewAdded(child: View) {
+    super.onViewAdded(child)
+    mChildListener.forEach {
+      it.onChildViewAdded(this, child)
+    }
+  }
+  
+  override fun onViewRemoved(child: View) {
+    super.onViewRemoved(child)
+    mChildListener.forEach {
+      it.onChildViewRemoved(this, child)
+    }
+  }
+}
