@@ -26,6 +26,7 @@ import com.ndhzs.netlayout.touch.ItemTouchProvider
  * - 可扩展事件分发
  * - 提供绘图的分发
  * - 提供在试图被摧毁时保存数据的接口
+ * - 添加和删除子 View 的回调
  *
  * 因为提供了扩展，所以部分方法不允许重写
  *
@@ -65,10 +66,6 @@ open class NetLayout2 @JvmOverloads constructor(
   
   final override fun addChildListener(l: IChildListener) {
     mChildListener.add(l)
-  }
-  
-  final override fun addChildListener(l: IChildListener, index: Int) {
-    mChildListener.add(index, l)
   }
   
   // 自定义绘图的监听

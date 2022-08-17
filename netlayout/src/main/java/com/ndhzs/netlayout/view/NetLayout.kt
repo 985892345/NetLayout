@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.ndhzs.netlayout.INetLayout
 import com.ndhzs.netlayout.R
-import com.ndhzs.netlayout.attrs.INetBean
 import com.ndhzs.netlayout.callback.OnWeightChangeListener
 import com.ndhzs.netlayout.attrs.NetLayoutAttrs
 import com.ndhzs.netlayout.attrs.NetLayoutParams
@@ -284,7 +283,7 @@ open class NetLayout @JvmOverloads constructor(
     requestLayout()
   }
   
-  override fun setOnWeightChangeListener(l: OnWeightChangeListener) {
+  override fun addOnWeightChangeListener(l: OnWeightChangeListener) {
     mOnWeightChangeListeners.add(l)
   }
   
@@ -314,7 +313,7 @@ open class NetLayout @JvmOverloads constructor(
   
   // 属性值
   @Suppress("LeakingThis")
-  protected val mNetAttrs: NetLayoutAttrs = NetLayoutAttrs.newInstance(this, attrs)
+  protected val mNetAttrs: NetLayoutAttrs = NetLayoutAttrs.newInstance(this, attrs, defStyleAttr, defStyleRes)
   
   // 参考 FrameLayout，用于在自身 wrap_content 而子 View 为 match_parent 时的测量
   private val mMatchParentChildren = ArrayList<View>()

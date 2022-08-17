@@ -122,12 +122,12 @@ interface INetLayout {
   
   
   /**
-   * 得到第 [start] - [end] 列的比重
+   * 得到第 [start] - [end] 列的比重，具体逻辑可看：[getRowsHeight]
    */
   fun getColumnsWeight(start: Int, end: Int): Float
   
   /**
-   * 得到 [start] - [end] 行的比重
+   * 得到 [start] - [end] 行的比重，具体逻辑可看：[getRowsHeight]
    */
   fun getRowsWeight(start: Int, end: Int): Float
   
@@ -139,7 +139,7 @@ interface INetLayout {
   /**
    * 设置行或列比重被修改的监听
    */
-  fun setOnWeightChangeListener(l: OnWeightChangeListener)
+  fun addOnWeightChangeListener(l: OnWeightChangeListener)
   
   /**
    * 将自身的列比重与 [layout] 同步
