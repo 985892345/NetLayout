@@ -194,74 +194,54 @@ open class NetLayout @JvmOverloads constructor(
   
   override fun setColumnWeight(column: Int, weight: Float) {
     checkColumn(column)
-    val old = setColumnWeightInternal(column, weight)
-    if (old != -1F) {
-      mOnWeightChangeListeners.forEach {
-        it.onChange(old, weight, column, SideType.COLUMN)
-      }
-      requestLayout()
-    }
-  }
-  
-  /**
-   * 返回 -1 表示值相同，不用设置
-   */
-  private fun setColumnWeightInternal(column: Int, weight: Float): Float {
+    require(weight >= 0) { "不支持小于 0 的比重" }
     val old = getColumnsWeightInternal(column, column)
-    if (old == weight) return -1F
+    if (old == weight) return
     when {
       weight == 1F -> mColumnChangedWeight.remove(column)
-      weight > 0F -> mColumnChangedWeight[column] = weight
-      else -> mColumnChangedWeight[column] = 0F
+      weight >= 0F -> mColumnChangedWeight[column] = weight
     }
-    return old
+    mOnWeightChangeListeners.forEach {
+      it.onChange(old, weight, column, SideType.COLUMN)
+    }
+    requestLayout()
   }
   
   override fun setRowWeight(row: Int, weight: Float) {
     checkRow(row)
-    val old = setRowWeightInternal(row, weight)
-    if (old != -1F) {
-      mOnWeightChangeListeners.forEach {
-        it.onChange(old, weight, row, SideType.ROW)
-      }
-      requestLayout()
-    }
-  }
-  
-  /**
-   * 返回 -1 表示值相同，不用设置
-   */
-  private fun setRowWeightInternal(row: Int, weight: Float): Float {
+    require(weight >= 0) { "不支持小于 0 的比重" }
     val old = getRowsWeightInternal(row, row)
-    if (old == weight) return -1F
+    if (old == weight) return
     when {
       weight == 1F -> mRowChangedWeight.remove(row)
-      weight > 0F -> mRowChangedWeight[row] = weight
-      else -> mRowChangedWeight[row] = 0F
+      weight >= 0F -> mRowChangedWeight[row] = weight
     }
-    return old
+    mOnWeightChangeListeners.forEach {
+      it.onChange(old, weight, row, SideType.ROW)
+    }
+    requestLayout()
   }
   
   override fun setColumnInitialWeight(column: Int, weight: Float) {
     checkColumn(column)
+    require(weight >= 0) { "不支持小于 0 的比重" }
     val old = getColumnsWeightInternal(column, column)
     if (old == weight) return
     when {
       weight == 1F -> mColumnInitialWeight.remove(column)
-      weight > 0F -> mColumnInitialWeight[column] = weight
-      else -> mColumnInitialWeight[column] = 0F
+      weight >= 0F -> mColumnInitialWeight[column] = weight
     }
     requestLayout()
   }
   
   override fun setRowInitialWeight(row: Int, weight: Float) {
     checkRow(row)
+    require(weight >= 0) { "不支持小于 0 的比重" }
     val old = getRowsWeightInternal(row, row)
     if (old == weight) return
     when {
       weight == 1F -> mRowInitialWeight.remove(row)
-      weight > 0F -> mRowInitialWeight[row] = weight
-      else -> mRowInitialWeight[row] = 0F
+      weight >= 0F -> mRowInitialWeight[row] = weight
     }
     requestLayout()
   }
@@ -380,9 +360,6 @@ open class NetLayout @JvmOverloads constructor(
     val widthIsExactly = MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY
     val heightIsExactly = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY
     
-    val widthIsWrap = layoutParams.width == LayoutParams.WRAP_CONTENT
-    val heightIsWrap = layoutParams.height == LayoutParams.WRAP_CONTENT
-    
     var maxWidth = 0
     var maxHeight = 0
     var childState = 0
@@ -407,15 +384,15 @@ open class NetLayout @JvmOverloads constructor(
         val childWithParentRowMultiple = childRowWeight / parentRowWeight
         
         val childWidthRatio =
-          if (widthIsWrap) childColumnWeight / initialSelfColumnWeight
+          if (!widthIsExactly) childColumnWeight / initialSelfColumnWeight
           else childWithParentColumnMultiple
         
         val childHeightRatio =
-          if (heightIsWrap) childRowWeight / initialSelfRowWeight
+          if (!heightIsExactly) childRowWeight / initialSelfRowWeight
           else childWithParentRowMultiple
         
-        lp.oldChildWidthRatio = childWithParentColumnMultiple
-        lp.oldChildHeightRatio = childWithParentRowMultiple
+        lp.oldChildWidthRatio = childWidthRatio
+        lp.oldChildHeightRatio = childHeightRatio
         
         measureChildWithRatio(
           child,
@@ -457,10 +434,10 @@ open class NetLayout @JvmOverloads constructor(
     // 在与 ScrollView 嵌套中可能你会设置一个 minHeight，
     // 如果此时你高度又设置成 wrap，然后调用 setRowWeight()，本意是扩大控件高度，
     // 但会受到你设置的 minHeight 限制，所以需要在既设置 wrap 又设置了 minHeight 的情况下扩大你设置的 minHeight
-    val minWidth = if (widthIsWrap) {
+    val minWidth = if (!widthIsExactly) {
       (suggestedMinimumWidth * (parentColumnWeight / initialSelfColumnWeight)).roundToInt()
     } else suggestedMinimumWidth
-    val minHeight = if (heightIsWrap) {
+    val minHeight = if (!heightIsExactly) {
       (suggestedMinimumHeight * (parentRowWeight / initialSelfRowWeight)).roundToInt()
     } else suggestedMinimumHeight
     maxWidth = max(maxWidth, minWidth)
@@ -522,7 +499,8 @@ open class NetLayout @JvmOverloads constructor(
    * 获取开始列到结束列所占的总比例大小
    */
   private fun getColumnsWeightInternal(start: Int, end: Int): Float {
-    if (end >= columnCount) throw IllegalArgumentException("end = $end   rowCount = $columnCount")
+    checkColumn(start)
+    checkColumn(end)
     var childColumnSize = 0F
     for (column in start..end) {
       childColumnSize += mColumnChangedWeight[column] ?: 1F
@@ -534,7 +512,8 @@ open class NetLayout @JvmOverloads constructor(
    * 获取开始行到结束行所占的总比例大小
    */
   private fun getRowsWeightInternal(start: Int, end: Int): Float {
-    if (end >= rowCount) throw IllegalArgumentException("end = $end   rowCount = $rowCount")
+    checkRow(start)
+    checkRow(end)
     var childRowSize = 0F
     for (row in start..end) {
       childRowSize += mRowChangedWeight[row] ?: 1F
@@ -733,7 +712,7 @@ open class NetLayout @JvmOverloads constructor(
   /**
    * 使用自己的顺序添加子 View
    */
-  fun addViewNoOrder(child: View, index: Int, params: LayoutParams) {
+  fun addViewWithoutOrder(child: View, index: Int, params: LayoutParams) {
     super.addView(child, index, params)
   }
   
