@@ -123,6 +123,13 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     initRowColumn()
   }
   
+  constructor(
+    bean: INetBean,
+    width: Int = MATCH_PARENT,
+    height: Int = MATCH_PARENT,
+    gravity: Int = Gravity.CENTER,
+  ) : this(bean.startRow, bean.endRow, bean.startColumn, bean.endColumn, width, height, gravity)
+  
   constructor(source: NetLayoutParams) : super(source) {
     this._startRow = source._startRow
     this._endRow = source._endRow
