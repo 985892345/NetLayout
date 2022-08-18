@@ -1,7 +1,7 @@
 package com.ndhzs.netlayout.touch.multiple
 
 import android.view.MotionEvent
-import android.view.View
+import android.view.ViewGroup
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 
@@ -23,7 +23,7 @@ interface IPointerDispatcher {
    *
    * 可以接收到 Down、Move、UP、Cancel
    */
-  fun isPrepareToIntercept(event: IPointerEvent, view: View): Boolean
+  fun isPrepareToIntercept(event: IPointerEvent, view: ViewGroup): Boolean
   
   /**
    * 得到该哪个 [IPointerTouchHandler] 处理事件
@@ -32,14 +32,14 @@ interface IPointerDispatcher {
    * - 如果需要延后才能处理事件，则可以返回 null
    * - 如果你一直放回 null，该事件可以被后面的子 View 处理，一直等到你不返回 null
    */
-  fun getInterceptHandler(event: IPointerEvent, view: View): IPointerTouchHandler?
+  fun getInterceptHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler?
   
   /**
    * Down 事件中，被顺序在前面的 [OnItemTouchListener] 拦截时回调
    *
    * 只能接收到 Down 事件
    */
-  fun onDownEventRobbed(event: MotionEvent, view: View) {}
+  fun onDownEventRobbed(event: MotionEvent, view: ViewGroup) {}
   
   /**
    * 在 ViewGroup 的 dispatchTouchEvent() 中调用，即事件分发下来时就回调，
@@ -47,7 +47,7 @@ interface IPointerDispatcher {
    *
    * 可以接收到 Down、Move、UP、Cancel
    */
-  fun onDispatchTouchEvent(event: MotionEvent, view: View) {}
+  fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
   
   /**
    * 当事件被某个分发者准备拦截时回调

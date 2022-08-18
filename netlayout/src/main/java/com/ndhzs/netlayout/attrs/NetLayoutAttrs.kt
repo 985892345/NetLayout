@@ -13,7 +13,8 @@ import com.ndhzs.netlayout.utils.AttrsUtil
  */
 open class NetLayoutAttrs(
   rowCount: Int,
-  columnCount: Int
+  columnCount: Int,
+  var isDebug: Boolean = false
 ) {
   
   var rowCount = rowCount
@@ -37,7 +38,8 @@ open class NetLayoutAttrs(
       ) {
         NetLayoutAttrs(
           R.styleable.NetLayout_net_rowCount.int(ROW_COUNT),
-          R.styleable.NetLayout_net_columnCount.int(COLUMN_COUNT)
+          R.styleable.NetLayout_net_columnCount.int(COLUMN_COUNT),
+          R.styleable.NetLayout_net_isDebug.boolean(false)
         )
       }
     }

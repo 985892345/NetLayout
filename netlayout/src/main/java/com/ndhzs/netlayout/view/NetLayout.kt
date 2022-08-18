@@ -203,6 +203,9 @@ open class NetLayout @JvmOverloads constructor(
     }
   }
   
+  /**
+   * 返回 -1 表示值相同，不用设置
+   */
   private fun setColumnWeightInternal(column: Int, weight: Float): Float {
     val old = getColumnsWeightInternal(column, column)
     if (old == weight) return -1F
@@ -225,6 +228,9 @@ open class NetLayout @JvmOverloads constructor(
     }
   }
   
+  /**
+   * 返回 -1 表示值相同，不用设置
+   */
   private fun setRowWeightInternal(row: Int, weight: Float): Float {
     val old = getRowsWeightInternal(row, row)
     if (old == weight) return -1F
@@ -314,6 +320,7 @@ open class NetLayout @JvmOverloads constructor(
   // 属性值
   @Suppress("LeakingThis")
   protected val mNetAttrs: NetLayoutAttrs = NetLayoutAttrs.newInstance(this, attrs, defStyleAttr, defStyleRes)
+    .also { DEBUG = it.isDebug }
   
   // 参考 FrameLayout，用于在自身 wrap_content 而子 View 为 match_parent 时的测量
   private val mMatchParentChildren = ArrayList<View>()

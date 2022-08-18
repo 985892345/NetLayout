@@ -6,13 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".demo.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <com.ndhzs.netlayout.view.NetLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:net_rowCount="8"
+        app:net_columnCount="4"
+        app:net_isDebug="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:net_layout_startRow="0"
+            app:net_layout_endRow="0"
+            app:net_layout_startColumn="0"
+            app:net_layout_endColumn="0"
+            android:background="@color/black"/>
+
+    </com.ndhzs.netlayout.view.NetLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

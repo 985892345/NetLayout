@@ -2,7 +2,6 @@ package com.ndhzs.netlayout.touch.multiple
 
 import android.util.SparseArray
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
@@ -186,7 +185,7 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
    */
   protected abstract fun getInterceptHandler(
     event: IPointerEvent,
-    view: View
+    view: ViewGroup
   ): IPointerTouchHandler?
   
   /**
@@ -198,7 +197,7 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   protected abstract fun onPointerEventRobbed(
     event: IPointerEvent,
     handler: IPointerTouchHandler?,
-    view: View
+    view: ViewGroup
   )
   
   /**
@@ -206,6 +205,6 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
    */
   protected abstract fun onUpEventWithoutHandler(
     event: IPointerEvent,
-    view: View
+    view: ViewGroup
   )
 }

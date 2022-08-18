@@ -1,6 +1,6 @@
 package com.ndhzs.netlayout.touch.multiple
 
-import android.view.View
+import android.view.ViewGroup
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 
 /**
@@ -11,5 +11,5 @@ import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
  * @date 2022/2/17 11:03
  */
 interface IPointerTouchHandler {
-  fun onPointerTouchEvent(event: IPointerEvent, view: View)
+  fun onPointerTouchEvent(event: IPointerEvent, view: ViewGroup)
 }

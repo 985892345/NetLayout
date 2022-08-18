@@ -2,7 +2,6 @@ package com.ndhzs.netlayout.touch.multiple
 
 import android.util.SparseArray
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent.Action.*
@@ -32,7 +31,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   
   override fun getInterceptHandler(
     event: IPointerEvent,
-    view: View
+    view: ViewGroup
   ): IPointerTouchHandler? {
     when (event.action) {
       DOWN, MOVE -> return findPointerTouchHandler(event, view)
@@ -45,7 +44,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   override fun onPointerEventRobbed(
     event: IPointerEvent,
     handler: IPointerTouchHandler?,
-    view: View
+    view: ViewGroup
   ) {
     if (event.action == CANCEL) {
       // 为 CANCEL 的时候，说明被前一个 OnItemTouchListener 拦截或者被外布局拦截
@@ -60,7 +59,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   
   override fun onUpEventWithoutHandler(
     event: IPointerEvent,
-    view: View
+    view: ViewGroup
   ) {
     // 这里是当前手指没有任何处理者处理
     val dispatcher = mDelayDispatchers.get(event.pointerId, null)
@@ -85,7 +84,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   /**
    * 询问所有的 dispatcher 是否拦截当前手指事件，需要拦截的话要么立即交出处理者，要么延后交出处理者
    */
-  private fun findPointerTouchHandler(event: IPointerEvent, view: View): IPointerTouchHandler? {
+  private fun findPointerTouchHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler? {
     if (event.event.actionMasked == MotionEvent.ACTION_DOWN) {
       mDelayDispatchers.clear() // 防止出现问题，进行一次清理
     }
@@ -118,7 +117,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
       }
     }
     // 走到这里说明没有任何一个 dispatcher 想要拦截
-    return askOtherWantToHandle(event, view)
+    return getDefaultTouchHandler(event, view)
   }
   
   /**
@@ -126,6 +125,6 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
    *
    * 如果没有任何一个 dispatcher 想要拦截，则会回调该方法，一般用于在子类中重写这个方法给特殊的处理者处理
    */
-  protected open fun askOtherWantToHandle(event: IPointerEvent, view: View): IPointerTouchHandler? =
+  protected open fun getDefaultTouchHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler? =
     null
 }
