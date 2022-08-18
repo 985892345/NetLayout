@@ -47,4 +47,10 @@ open class NetLayoutAttrs(
     const val ROW_COUNT = 4
     const val COLUMN_COUNT = 4
   }
+  
+  init {
+    if (rowCount <= 0 || columnCount <= 0) {
+      error("rowCount 和 columnCount 都不能小于或等于 0！")
+    }
+  }
 }

@@ -188,13 +188,13 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
   /**
    * 上次测量的与父布局总宽度比
    */
-  var oldChildWidthRatio = 0F
+  var oldChildWidthShowRatio = 0F
     internal set
   
   /**
    * 上次测量的与父布局总高度比
    */
-  var oldChildHeightRatio = 0F
+  var oldChildHeightShowRatio = 0F
     internal set
   
   /**
@@ -252,8 +252,8 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     _endRow = other._endRow
     _startColumn = other._startColumn
     _endColumn = other._endColumn
-    oldChildWidthRatio = other.oldChildWidthRatio
-    oldChildHeightRatio = other.oldChildHeightRatio
+    oldChildWidthShowRatio = other.oldChildWidthShowRatio
+    oldChildHeightShowRatio = other.oldChildHeightShowRatio
     constraintLeft = other.constraintLeft
     constraintRight = other.constraintRight
     constraintTop = other.constraintTop
