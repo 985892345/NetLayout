@@ -89,7 +89,7 @@ open class NetLayout @JvmOverloads constructor(
     addView(item, lp)
   }
   
-  override fun findItemUnderByXY(x: Int, y: Int): View? {
+  override fun findViewUnderByXY(x: Int, y: Int): View? {
     for (i in childCount - 1 downTo 0) {
       val child = getChildAt(i)
       if (child.visibility == GONE) continue
@@ -105,7 +105,7 @@ open class NetLayout @JvmOverloads constructor(
     return null
   }
   
-  override fun findItemUnderByRowColumn(row: Int, column: Int): View? {
+  override fun findViewUnderByRowColumn(row: Int, column: Int): View? {
     for (i in childCount - 1 downTo 0) {
       val child = getChildAt(i)
       if (child.visibility == GONE) continue

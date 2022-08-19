@@ -10,8 +10,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.ndhzs.netlayout.R
-import com.ndhzs.netlayout.child.IChildListener
-import com.ndhzs.netlayout.child.IChildListenerProvider
+import com.ndhzs.netlayout.child.IChildExistListener
+import com.ndhzs.netlayout.child.IChildExistListenerProvider
 import com.ndhzs.netlayout.draw.ItemDecoration
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.TouchDispatcher
@@ -40,7 +40,7 @@ open class NetLayout2 @JvmOverloads constructor(
   defStyleAttr: Int = R.attr.netLayoutStyle,
   defStyleRes: Int = 0
 ) : NetLayout(context, attrs, defStyleAttr, defStyleRes),
-  ItemDecorationProvider, ItemTouchProvider, SaveStateProvider, IChildListenerProvider {
+  ItemDecorationProvider, ItemTouchProvider, SaveStateProvider, IChildExistListenerProvider {
   
   final override fun addItemDecoration(decor: ItemDecoration) {
     mItemDecoration.add(mItemDecoration.size, decor)
@@ -64,8 +64,8 @@ open class NetLayout2 @JvmOverloads constructor(
     mSaveBundleListeners[tag] = l
   }
   
-  final override fun addChildListener(l: IChildListener) {
-    mChildListener.add(l)
+  final override fun addChildExistListener(l: IChildExistListener) {
+    mChildExistListener.add(l)
   }
   
   // 自定义绘图的监听
@@ -78,7 +78,7 @@ open class NetLayout2 @JvmOverloads constructor(
   private val mSaveBundleListeners = ArrayMap<String, OnSaveStateListener>(3)
   
   // 添加或删除子 View 时的监听
-  private val mChildListener = ArrayList<IChildListener>(1)
+  private val mChildExistListener = ArrayList<IChildExistListener>(1)
   
   final override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     mTouchDispatchHelper.dispatchTouchEvent(ev, this)
@@ -166,14 +166,14 @@ open class NetLayout2 @JvmOverloads constructor(
   
   override fun onViewAdded(child: View) {
     super.onViewAdded(child)
-    mChildListener.forEach {
+    mChildExistListener.forEach {
       it.onChildViewAdded(this, child)
     }
   }
   
   override fun onViewRemoved(child: View) {
     super.onViewRemoved(child)
-    mChildListener.forEach {
+    mChildExistListener.forEach {
       it.onChildViewRemoved(this, child)
     }
   }

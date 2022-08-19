@@ -25,15 +25,18 @@ interface INetLayout : IRow, IColumn {
   
   /**
    * 倒序查找子 View
-   * @see findItemUnderByRowColumn
+   *
+   * 倒序的原因是因为一般排在后面的显示在最上面
+   *
+   * @see findViewUnderByRowColumn
    */
-  fun findItemUnderByXY(x: Int, y: Int): View?
+  fun findViewUnderByXY(x: Int, y: Int): View?
   
   /**
    * 根据行和列倒序查找子 View
-   * @see findItemUnderByXY
+   * @see findViewUnderByXY
    */
-  fun findItemUnderByRowColumn(row: Int, column: Int): View?
+  fun findViewUnderByRowColumn(row: Int, column: Int): View?
   
   /**
    * 设置行数和列数

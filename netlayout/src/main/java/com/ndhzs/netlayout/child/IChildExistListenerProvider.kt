@@ -7,6 +7,6 @@ package com.ndhzs.netlayout.child
  * @email 2767465918@qq.com
  * @date 2022/5/23 12:25
  */
-interface IChildListenerProvider {
-  fun addChildListener(l: IChildListener)
+interface IChildExistListenerProvider {
+  fun addChildExistListener(l: IChildExistListener)
 }

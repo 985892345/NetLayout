@@ -8,7 +8,7 @@ import android.view.View
  * @email 2767465918@qq.com
  * @date 2022/5/23 12:23
  */
-interface IChildListener {
+interface IChildExistListener {
   fun onChildViewAdded(parent: View, child: View)
   fun onChildViewRemoved(parent: View, child: View)
 }
