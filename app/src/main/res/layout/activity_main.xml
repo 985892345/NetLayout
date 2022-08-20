@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.ndhzs.netlayout.view.NetLayout
+        <com.ndhzs.netlayout.view.NetLayout2
             android:id="@+id/netLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -207,7 +207,7 @@
                 app:net_layout_endColumn="0"
                 tools:ignore="HardcodedText" />
 
-        </com.ndhzs.netlayout.view.NetLayout>
+        </com.ndhzs.netlayout.view.NetLayout2>
 
     </com.ndhzs.netlayout.demo.NetScrollView>
 

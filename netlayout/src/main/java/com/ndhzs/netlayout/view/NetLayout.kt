@@ -15,6 +15,8 @@ import com.ndhzs.netlayout.R
 import com.ndhzs.netlayout.callback.OnWeightChangeListener
 import com.ndhzs.netlayout.attrs.NetLayoutAttrs
 import com.ndhzs.netlayout.attrs.NetLayoutParams
+import com.ndhzs.netlayout.orientation.IColumn
+import com.ndhzs.netlayout.orientation.IRow
 import com.ndhzs.netlayout.utils.SideType
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -292,7 +294,7 @@ open class NetLayout @JvmOverloads constructor(
     mOnWeightChangeListeners.add(l)
   }
   
-  override fun syncColumnWeight(layout: INetLayout): Boolean {
+  override fun syncColumnWeight(layout: IColumn): Boolean {
     if (columnCount == layout.columnCount) {
       mColumnChangedWeight.clear()
       for (i in 0 until columnCount) {
@@ -304,7 +306,7 @@ open class NetLayout @JvmOverloads constructor(
     return false
   }
   
-  override fun syncRowWeight(layout: INetLayout): Boolean {
+  override fun syncRowWeight(layout: IRow): Boolean {
     if (rowCount == layout.rowCount) {
       mRowChangedWeight.clear()
       for (i in 0 until rowCount) {

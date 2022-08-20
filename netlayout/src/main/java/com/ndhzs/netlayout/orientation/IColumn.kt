@@ -1,7 +1,5 @@
 package com.ndhzs.netlayout.orientation
 
-import com.ndhzs.netlayout.INetLayout
-
 /**
  * ...
  *
@@ -87,5 +85,5 @@ interface IColumn {
    * 将自身的列比重与 [layout] 同步
    * @return 不符合要求返回 false
    */
-  fun syncColumnWeight(layout: INetLayout): Boolean
+  fun syncColumnWeight(layout: IColumn): Boolean
 }
