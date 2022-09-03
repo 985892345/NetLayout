@@ -349,8 +349,7 @@ open class NetLayout @JvmOverloads constructor(
    * 添加 6 进来: 2  4  6  6  6  8
    *                         ↑
    * ```
-   * **NOTE：** 排序基于 [NetLayoutParams.compareTo] 方法，
-   * 可在继承 [NetLayout] 的前提下重写 [NetLayoutParams.compareTo] 方法
+   * 排序基于 [compareLayoutParams] 方法
    *
    * 如果你想禁止该功能，可以重写它返回 -1 即可
    */
@@ -361,12 +360,21 @@ open class NetLayout @JvmOverloads constructor(
       val half = (start + end) / 2
       val view = getChildAt(half)
       val lp = view.layoutParams.net()
-      when { // 折半插入，自己画图就能看懂
-        params < lp -> end = half - 1
-        else -> start = half + 1
+      // 折半插入，自己画图就能看懂
+      if (compareLayoutParams(params, lp) < 0) {
+        end = half - 1
+      } else {
+        start = half + 1
       }
     }
     return start
+  }
+  
+  /**
+   * 在添加子 View 时比较 [NetLayoutParams] 的大小
+   */
+  protected open fun compareLayoutParams(o1: NetLayoutParams, o2: NetLayoutParams): Int {
+    return o1.compareTo(o2)
   }
   
   /**
@@ -727,13 +735,6 @@ open class NetLayout @JvmOverloads constructor(
     }
     val newIndex = getChildAfterIndex(child, lp)
     super.addView(child, newIndex, params)
-  }
-  
-  /**
-   * 使用自己的顺序添加子 View
-   */
-  fun addViewWithoutOrder(child: View, index: Int, params: LayoutParams) {
-    super.addView(child, index, params)
   }
   
   override fun generateLayoutParams(attrs: AttributeSet): LayoutParams {
