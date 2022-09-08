@@ -10,7 +10,7 @@ import android.view.ViewGroup
  * @email 2767465918@qq.com
  * @date 2022/2/15 14:55
  */
-class TouchDispatcher : ItemTouchProvider {
+class TouchDispatcher : ItemTouchListenerContainer {
   // 自定义事件处理的监听
   private val mItemTouchListener = ArrayList<OnItemTouchListener>(5)
   
@@ -20,8 +20,8 @@ class TouchDispatcher : ItemTouchProvider {
   // 自定义事件处理中提前拦截的监听者
   private var mBeforeInterceptingOnTouchListener: OnItemTouchListener? = null
   
-  override fun addItemTouchListener(l: OnItemTouchListener) {
-    mItemTouchListener.add(l)
+  override fun addItemTouchListener(listener: OnItemTouchListener) {
+    mItemTouchListener.add(listener)
   }
   
   fun dispatchTouchEvent(event: MotionEvent, view: ViewGroup) {

@@ -55,6 +55,7 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
         }
       }
       MotionEvent.ACTION_MOVE -> {
+        // 能回调这里说明之前的 DOWN 和 POINTER_DOWN 在 getInterceptHandler() 全都返回 null
         var isIntercept = false
         // 这里需要遍历完所有的手指，询问是否有要拦截的 handler，可能要拦截的不止一个
         for (index in 0 until event.pointerCount) {
@@ -65,6 +66,10 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
             onPointerEventRobbed(pointerEvent, handler, view)
             mHandlerById.put(id, handler)
             isIntercept = true
+            /*
+            * 按照原生事件分发的逻辑，OnInterceptTouchEvent() 的 MOVE 拦截后，是不会立即回调 onTouchEvent()
+            * 所以这里也遵守该规则
+            * */
           }
         }
         return isIntercept
@@ -96,14 +101,14 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   final override fun onTouchEvent(event: MotionEvent, view: ViewGroup) {
     when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        // 走到这里说明之前在 isAdvanceIntercept() 的 DOWN 事件 return true 了
+        // 走到这里说明之前在 isBeforeIntercept() 的 DOWN 事件 return true 了
         val index = event.actionIndex
         val id = event.getPointerId(index)
         val pointerEvent = event.toPointerEvent(index, id)
         mHandlerById[id].onPointerTouchEvent(pointerEvent, view)
       }
       MotionEvent.ACTION_POINTER_DOWN -> {
-        // 走到这一步说明之前在 isAdvanceIntercept() 的 DOWN 事件 return true 了
+        // 走到这一步说明之前在 isBeforeIntercept() 的 DOWN 事件 return true 了
         val index = event.actionIndex
         val id = event.getPointerId(index)
         val pointerEvent = event.toPointerEvent(index, id)

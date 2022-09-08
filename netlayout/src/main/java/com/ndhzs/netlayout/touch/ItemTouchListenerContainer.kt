@@ -12,7 +12,7 @@ package com.ndhzs.netlayout.touch
  * @email 2767465918@qq.com
  * @date 2022/3/8 11:37
  */
-interface ItemTouchProvider {
+interface ItemTouchListenerContainer {
   
   /**
    * 处理 View 的滑动事件
@@ -21,9 +21,9 @@ interface ItemTouchProvider {
    *
    * 这样以后要扩展事件不是直接重写 View 的方法，而是添加一个 [OnItemTouchListener] 来增加新的功能
    */
-  fun addItemTouchListener(l: OnItemTouchListener)
+  fun addItemTouchListener(listener: OnItemTouchListener)
   
-  fun addItemTouchListener(vararg ls: OnItemTouchListener) {
-    ls.forEach { addItemTouchListener(it) }
+  fun addItemTouchListener(vararg listeners: OnItemTouchListener) {
+    listeners.forEach { addItemTouchListener(it) }
   }
 }

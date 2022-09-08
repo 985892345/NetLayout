@@ -11,7 +11,7 @@ package com.ndhzs.netlayout.draw
  * @email 2767465918@qq.com
  * @date 2022/3/8 11:33
  */
-interface ItemDecorationProvider {
+interface ItemDecorationContainer {
   
   /**
    * 添加自定义绘制

@@ -14,12 +14,12 @@ import com.ndhzs.netlayout.touch.OnItemTouchListener
  * @email 2767465918@qq.com
  * @date 2022/3/8 11:40
  */
-interface SaveStateProvider {
+interface SaveStateListenerContainer {
   
   /**
    * 可用于在 [ItemDecoration] 和 [OnItemTouchListener] 中，View 即将被摧毁时保存一些必要的信息
    * @param tag 唯一标记，请尽可能的不要重复
-   * @param l 与 [tag] 对应的监听
+   * @param listener 与 [tag] 对应的监听
    */
-  fun addSaveStateListener(tag: String, l: OnSaveStateListener)
+  fun addSaveStateListener(tag: String, listener: OnSaveStateListener)
 }

@@ -1,5 +1,7 @@
 package com.ndhzs.netlayout.view
 
+import android.animation.Animator
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
@@ -10,15 +12,19 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.ndhzs.netlayout.R
-import com.ndhzs.netlayout.child.IChildExistListener
-import com.ndhzs.netlayout.child.IChildExistListenerProvider
+import com.ndhzs.netlayout.child.OnChildExistListener
+import com.ndhzs.netlayout.child.ChildExistListenerContainer
 import com.ndhzs.netlayout.draw.ItemDecoration
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.TouchDispatcher
 import com.ndhzs.netlayout.save.OnSaveStateListener
-import com.ndhzs.netlayout.draw.ItemDecorationProvider
-import com.ndhzs.netlayout.save.SaveStateProvider
-import com.ndhzs.netlayout.touch.ItemTouchProvider
+import com.ndhzs.netlayout.draw.ItemDecorationContainer
+import com.ndhzs.netlayout.save.SaveStateListenerContainer
+import com.ndhzs.netlayout.touch.ItemTouchListenerContainer
+import com.ndhzs.netlayout.transition.ChildVisibleListenerContainer
+import com.ndhzs.netlayout.transition.INetLayoutTransition
+import com.ndhzs.netlayout.transition.NetLayoutTransition
+import com.ndhzs.netlayout.transition.OnChildVisibleListener
 
 /**
  * 专门用于提供一些分发扩展的 ViewGroup
@@ -40,7 +46,13 @@ open class NetLayout2 @JvmOverloads constructor(
   defStyleAttr: Int = R.attr.netLayoutStyle,
   defStyleRes: Int = 0
 ) : NetLayout(context, attrs, defStyleAttr, defStyleRes),
-  ItemDecorationProvider, ItemTouchProvider, SaveStateProvider, IChildExistListenerProvider {
+  ItemDecorationContainer,
+  ItemTouchListenerContainer,
+  SaveStateListenerContainer,
+  ChildExistListenerContainer,
+  ChildVisibleListenerContainer,
+  INetLayoutTransition
+{
   
   final override fun addItemDecoration(decor: ItemDecoration) {
     mItemDecoration.add(mItemDecoration.size, decor)
@@ -50,22 +62,22 @@ open class NetLayout2 @JvmOverloads constructor(
     mItemDecoration.add(index, decor)
   }
   
-  final override fun addItemTouchListener(l: OnItemTouchListener) {
-    mTouchDispatchHelper.addItemTouchListener(l)
+  final override fun addItemTouchListener(listener: OnItemTouchListener) {
+    mTouchDispatchHelper.addItemTouchListener(listener)
   }
   
-  final override fun addSaveStateListener(tag: String, l: OnSaveStateListener) {
+  final override fun addSaveStateListener(tag: String, listener: OnSaveStateListener) {
     val bundle = mSaveBundleListenerCache[tag]
     if (bundle != null) {
       // 如果有之前保留的数据，意思是设置监听前就得到了保留的数据
-      l.onRestoreState(bundle)
+      listener.onRestoreState(bundle)
       mSaveBundleListenerCache.remove(tag)
     }
-    mSaveBundleListeners[tag] = l
+    mSaveBundleListeners[tag] = listener
   }
   
-  final override fun addChildExistListener(l: IChildExistListener) {
-    mChildExistListener.add(l)
+  final override fun addChildExistListener(listener: OnChildExistListener) {
+    mChildExistListener.add(listener)
   }
   
   // 自定义绘图的监听
@@ -78,7 +90,7 @@ open class NetLayout2 @JvmOverloads constructor(
   private val mSaveBundleListeners = ArrayMap<String, OnSaveStateListener>(3)
   
   // 添加或删除子 View 时的监听
-  private val mChildExistListener = ArrayList<IChildExistListener>(1)
+  private val mChildExistListener = ArrayList<OnChildExistListener>(1)
   
   final override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     mTouchDispatchHelper.dispatchTouchEvent(ev, this)
@@ -139,7 +151,8 @@ open class NetLayout2 @JvmOverloads constructor(
    * 用于在布局被摧毁时保存必要的信息
    */
   open class NetSavedState : BaseSavedState {
-    val saveBundleListeners: ArrayMap<String, Parcelable?> = ArrayMap() // 保存的 mSaveBundleListeners 的信息
+    val saveBundleListeners: ArrayMap<String, Parcelable?> =
+      ArrayMap() // 保存的 mSaveBundleListeners 的信息
     
     constructor(superState: Parcelable?) : super(superState)
     
@@ -164,17 +177,56 @@ open class NetLayout2 @JvmOverloads constructor(
     }
   }
   
-  override fun onViewAdded(child: View) {
+  final override fun onViewAdded(child: View) {
     super.onViewAdded(child)
     mChildExistListener.forEach {
       it.onChildViewAdded(this, child)
     }
   }
   
-  override fun onViewRemoved(child: View) {
+  final override fun onViewRemoved(child: View) {
     super.onViewRemoved(child)
     mChildExistListener.forEach {
       it.onChildViewRemoved(this, child)
     }
+  }
+  
+  final override fun addChildVisibleListener(listener: OnChildVisibleListener) {
+    mLayoutTransition.addChildVisibleListener(listener)
+  }
+  
+  private val mLayoutTransition = NetLayoutTransition()
+  
+  @Deprecated("不支持该方法", ReplaceWith("使用 INetLayoutTransition 的方法代替"), DeprecationLevel.HIDDEN)
+  final override fun setLayoutTransition(transition: LayoutTransition?) {
+    throw IllegalArgumentException("${this::class.simpleName} 不支持 setLayoutTransition()，请使用 INetLayoutTransition 的方法代替")
+  }
+  
+  final override fun getLayoutTransition(): LayoutTransition? {
+    return null
+  }
+  
+  init {
+    super.setLayoutTransition(mLayoutTransition)
+  }
+  
+  final override fun addChangingAppearingAnim(anim: Animator) {
+    mLayoutTransition.addChangingAppearingAnim(anim)
+  }
+  
+  final override fun addChangingDisappearingAnim(anim: Animator) {
+    mLayoutTransition.addChangingDisappearingAnim(anim)
+  }
+  
+  final override fun addAppearingAnim(anim: Animator) {
+    mLayoutTransition.addAppearingAnim(anim)
+  }
+  
+  final override fun addDisappearingAnim(anim: Animator) {
+    mLayoutTransition.addDisappearingAnim(anim)
+  }
+  
+  final override fun addChangingAnim(anim: Animator) {
+    mLayoutTransition.addChangingAnim(anim)
   }
 }
