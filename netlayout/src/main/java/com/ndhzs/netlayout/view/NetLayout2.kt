@@ -229,4 +229,12 @@ open class NetLayout2 @JvmOverloads constructor(
   final override fun addChangingAnim(anim: Animator) {
     mLayoutTransition.addChangingAnim(anim)
   }
+  
+  override fun addTransitionListener(listener: LayoutTransition.TransitionListener) {
+    mLayoutTransition.addTransitionListener(listener)
+  }
+  
+  override fun removeTransitionListener(listener: LayoutTransition.TransitionListener) {
+    mLayoutTransition.removeTransitionListener(listener)
+  }
 }

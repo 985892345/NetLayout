@@ -1,6 +1,7 @@
 package com.ndhzs.netlayout.transition
 
 import android.animation.Animator
+import android.animation.LayoutTransition
 
 /**
  * ...
@@ -35,4 +36,14 @@ interface INetLayoutTransition {
    * 子 View 布局大小改变时的动画
    */
   fun addChangingAnim(anim: Animator)
+  
+  /**
+   * 添加一个布局改动监听 [LayoutTransition.addTransitionListener]
+   */
+  fun addTransitionListener(listener: LayoutTransition.TransitionListener)
+  
+  /**
+   * 移除一个布局改动监听[LayoutTransition.removeTransitionListener]
+   */
+  fun removeTransitionListener(listener: LayoutTransition.TransitionListener)
 }

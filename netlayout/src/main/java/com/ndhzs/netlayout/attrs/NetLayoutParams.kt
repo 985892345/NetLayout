@@ -66,22 +66,22 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
   private var _startColumn: Int
   private var _endColumn: Int
   
-  override var startRow: Int = UNSET
+  final override var startRow: Int = UNSET
     set(value) {
       _startRow = value
       field = value
     }
-  override var endRow: Int = UNSET
+  final override var endRow: Int = UNSET
     set(value) {
       _endRow = value
       field = value
     }
-  override var startColumn: Int = UNSET
+  final override var startColumn: Int = UNSET
     set(value) {
       _startColumn = value
       field = value
     }
-  override var endColumn: Int = UNSET
+  final override var endColumn: Int = UNSET
     set(value) {
       _endColumn = value
       field = value
