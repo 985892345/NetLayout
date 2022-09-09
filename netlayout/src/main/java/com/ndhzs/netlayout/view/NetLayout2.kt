@@ -22,8 +22,8 @@ import com.ndhzs.netlayout.draw.ItemDecorationContainer
 import com.ndhzs.netlayout.save.SaveStateListenerContainer
 import com.ndhzs.netlayout.touch.ItemTouchListenerContainer
 import com.ndhzs.netlayout.transition.ChildVisibleListenerContainer
-import com.ndhzs.netlayout.transition.INetLayoutTransition
-import com.ndhzs.netlayout.transition.NetLayoutTransition
+import com.ndhzs.netlayout.transition.ILayoutTransition
+import com.ndhzs.netlayout.transition.LayoutTransitionHelper
 import com.ndhzs.netlayout.transition.OnChildVisibleListener
 
 /**
@@ -51,7 +51,7 @@ open class NetLayout2 @JvmOverloads constructor(
   SaveStateListenerContainer,
   ChildExistListenerContainer,
   ChildVisibleListenerContainer,
-  INetLayoutTransition
+  ILayoutTransition
 {
   
   final override fun addItemDecoration(decor: ItemDecoration) {
@@ -195,7 +195,7 @@ open class NetLayout2 @JvmOverloads constructor(
     mLayoutTransition.addChildVisibleListener(listener)
   }
   
-  private val mLayoutTransition = NetLayoutTransition()
+  private val mLayoutTransition = LayoutTransitionHelper()
   
   @Deprecated("不支持该方法", ReplaceWith("使用 INetLayoutTransition 的方法代替"), DeprecationLevel.HIDDEN)
   final override fun setLayoutTransition(transition: LayoutTransition?) {
@@ -210,31 +210,31 @@ open class NetLayout2 @JvmOverloads constructor(
     super.setLayoutTransition(mLayoutTransition)
   }
   
-  final override fun addChangingAppearingAnim(anim: Animator) {
-    mLayoutTransition.addChangingAppearingAnim(anim)
+  final override fun addAnimator(type: ILayoutTransition.TransitionType, animator: Animator) {
+    mLayoutTransition.addAnimator(type, animator)
   }
   
-  final override fun addChangingDisappearingAnim(anim: Animator) {
-    mLayoutTransition.addChangingDisappearingAnim(anim)
+  final override fun setDuration(type: ILayoutTransition.TransitionType, duration: Long) {
+    mLayoutTransition.setDuration(type, duration)
   }
   
-  final override fun addAppearingAnim(anim: Animator) {
-    mLayoutTransition.addAppearingAnim(anim)
+  final override fun getDuration(type: ILayoutTransition.TransitionType): Long {
+    return mLayoutTransition.getDuration(type)
   }
   
-  final override fun addDisappearingAnim(anim: Animator) {
-    mLayoutTransition.addDisappearingAnim(anim)
+  final override fun setStartDelay(type: ILayoutTransition.TransitionType, delay: Long) {
+    mLayoutTransition.setStartDelay(type, delay)
   }
   
-  final override fun addChangingAnim(anim: Animator) {
-    mLayoutTransition.addChangingAnim(anim)
+  final override fun getStartDelay(type: ILayoutTransition.TransitionType): Long {
+    return mLayoutTransition.getDuration(type)
   }
   
-  override fun addTransitionListener(listener: LayoutTransition.TransitionListener) {
+  final override fun addTransitionListener(listener: ILayoutTransition.TransitionListener) {
     mLayoutTransition.addTransitionListener(listener)
   }
   
-  override fun removeTransitionListener(listener: LayoutTransition.TransitionListener) {
+  final override fun removeTransitionListener(listener: ILayoutTransition.TransitionListener) {
     mLayoutTransition.removeTransitionListener(listener)
   }
 }
