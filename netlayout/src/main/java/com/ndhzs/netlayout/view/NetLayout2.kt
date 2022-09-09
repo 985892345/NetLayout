@@ -197,7 +197,7 @@ open class NetLayout2 @JvmOverloads constructor(
   
   private val mLayoutTransition = LayoutTransitionHelper()
   
-  @Deprecated("不支持该方法", ReplaceWith("使用 INetLayoutTransition 的方法代替"), DeprecationLevel.HIDDEN)
+  @Deprecated("不支持该方法", ReplaceWith("使用 ILayoutTransition 的方法代替"), DeprecationLevel.HIDDEN)
   final override fun setLayoutTransition(transition: LayoutTransition?) {
     throw IllegalArgumentException("${this::class.simpleName} 不支持 setLayoutTransition()，请使用 INetLayoutTransition 的方法代替")
   }
