@@ -237,4 +237,8 @@ open class NetLayout2 @JvmOverloads constructor(
   final override fun removeTransitionListener(listener: ILayoutTransition.TransitionListener) {
     mLayoutTransition.removeTransitionListener(listener)
   }
+  
+  final override fun setAnimateParentHierarchy(animateParentHierarchy: Boolean) {
+    mLayoutTransition.setAnimateParentHierarchy(animateParentHierarchy)
+  }
 }

@@ -10,7 +10,7 @@ import com.ndhzs.netlayout.transition.ILayoutTransition.TransitionType
 
 /**
  * ## 背景
- * 因为想实现对子 View Visibility 的监听，我去看了一天的源码，发现官网虽然设置的有回调：onChildVisibilityChanged()
+ * 因为想实现对子 View Visibility 的监听，我去看了一天的源码，发现官方虽然设置得有回调：onChildVisibilityChanged()
  * 但是有 @UnsupportedAppUsage 注解，是不允许使用的，所以只能去找其他方法，找了半天，
  * 最后只找到这个 [LayoutTransition] 是最合适的，但就是设置后就不允许其他人设置了
  *

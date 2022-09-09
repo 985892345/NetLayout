@@ -49,6 +49,11 @@ interface ILayoutTransition {
    */
   fun removeTransitionListener(listener: TransitionListener)
   
+  /**
+   * 详见 [LayoutTransition.setAnimateParentHierarchy]
+   */
+  fun setAnimateParentHierarchy(animateParentHierarchy: Boolean)
+  
   interface TransitionListener {
     fun startTransition(type: TransitionType, parent: ViewGroup, child: View)
     fun endTransition(type: TransitionType, parent: ViewGroup, child: View)
