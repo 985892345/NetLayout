@@ -54,7 +54,7 @@ internal class LayoutTransitionHelper : LayoutTransition(), ChildVisibleListener
     setAnimator(CHANGING, mChangingAnimSet)
   }
   
-  override fun addAnimator(type: TransitionType, animator: Animator) {
+  override fun addAnimator(type: TransitionType, animator: Animator?) {
     when (type) {
       TransitionType.CHANGE_APPEARING -> mChangingAppearingAnimSet.playTogether(animator)
       TransitionType.CHANGE_DISAPPEARING -> mChangingDisappearingAnimSet.playTogether(animator)

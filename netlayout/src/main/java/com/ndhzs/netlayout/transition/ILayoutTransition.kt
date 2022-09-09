@@ -17,7 +17,7 @@ interface ILayoutTransition {
   /**
    * 设置动画
    */
-  fun addAnimator(type: TransitionType, animator: Animator)
+  fun addAnimator(type: TransitionType, animator: Animator?)
   
   /**
    * 设置动画时间
