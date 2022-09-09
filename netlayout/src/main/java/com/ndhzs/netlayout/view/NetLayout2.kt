@@ -208,6 +208,7 @@ open class NetLayout2 @JvmOverloads constructor(
   
   init {
     super.setLayoutTransition(mLayoutTransition)
+    mLayoutTransition.setAnimateParentHierarchy(false)
   }
   
   final override fun addAnimator(type: ILayoutTransition.TransitionType, animator: Animator) {

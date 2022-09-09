@@ -51,6 +51,13 @@ interface ILayoutTransition {
   
   /**
    * 详见 [LayoutTransition.setAnimateParentHierarchy]
+   *
+   * 官方的默认值为 true，但由于 ViewPager2 在子 View 设置为 true 时会出现闪退，
+   * 所以本控件把默认值改为 false
+   *
+   * 具体可看：
+   * - https://developer.android.com/reference/androidx/viewpager2/widget/ViewPager2#setAdapter(androidx.recyclerview.widget.RecyclerView.Adapter)
+   * - https://stackoverflow.com/questions/59660691/java-lang-illegalstateexception-page-can-only-be-offset-by-a-positive-amount
    */
   fun setAnimateParentHierarchy(animateParentHierarchy: Boolean)
   
