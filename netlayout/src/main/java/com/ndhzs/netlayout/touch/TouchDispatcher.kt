@@ -2,6 +2,7 @@ package com.ndhzs.netlayout.touch
 
 import android.view.MotionEvent
 import android.view.ViewGroup
+import com.ndhzs.netlayout.utils.forEachInline
 
 /**
  * ## 自定义事件分发者，参考 RV 的 ItemTouchListener 设计
@@ -25,7 +26,7 @@ class TouchDispatcher : ItemTouchListenerContainer {
   }
   
   fun dispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
-    mItemTouchListener.forEach {
+    mItemTouchListener.forEachInline {
       it.onDispatchTouchEvent(event, view)
     }
   }
@@ -34,7 +35,7 @@ class TouchDispatcher : ItemTouchListenerContainer {
     val action = event.actionMasked
     if (action == MotionEvent.ACTION_DOWN) {
       mBeforeInterceptingOnTouchListener = null // 重置
-      mItemTouchListener.forEach { listener ->
+      mItemTouchListener.forEachInline { listener ->
         if (mBeforeInterceptingOnTouchListener == null) {
           if (listener.isBeforeIntercept(event, view)) {
             mBeforeInterceptingOnTouchListener = listener
@@ -61,14 +62,14 @@ class TouchDispatcher : ItemTouchListenerContainer {
       *      2、CourseLayout 自身拦截了事件
       *      ==> onInterceptTouchEvent() 不会再被调用，也就不会再走到这一步）
       * 2、事件一定被子 View 拦截
-      * 3、mAdvanceInterceptingOnTouchListener 也一定为 null
+      * 3、mBeforeInterceptingOnTouchListener 也一定为 null
       * */
-      mItemTouchListener.forEach { listener ->
+      mItemTouchListener.forEachInline { listener ->
         if (listener.isBeforeIntercept(event, view)) {
           mBeforeInterceptingOnTouchListener = listener
           val cancelEvent = event.also { it.action = MotionEvent.ACTION_CANCEL }
           // 因为之前所有 listener 都通知了 Down 事件，所以需要全部都通知取消事件
-          mItemTouchListener.forEach {
+          mItemTouchListener.forEachInline {
             if (it !== listener) {
               it.isBeforeIntercept(cancelEvent, view)
             }
@@ -97,7 +98,7 @@ class TouchDispatcher : ItemTouchListenerContainer {
       // 所以这里调用 isAfterIntercept()
       mAfterInterceptingOnTouchListener = null // 重置
       // 分配自定义事件处理的监听
-      mItemTouchListener.forEach { listener ->
+      mItemTouchListener.forEachInline { listener ->
         if (mAfterInterceptingOnTouchListener == null) {
           if (listener.isAfterIntercept(event, view)) {
             mAfterInterceptingOnTouchListener = listener
@@ -118,12 +119,12 @@ class TouchDispatcher : ItemTouchListenerContainer {
     } else {
       /*
       * 走到这里说明：
-      * 1、Down 事件中没有提前拦截的 listener，即 mAdvanceInterceptingOnTouchListener 为 null
+      * 1、Down 事件中没有提前拦截的 listener，即 mBeforeInterceptingOnTouchListener 为 null
       * 2、Down 事件中没有任何子 View 拦截
-      * 3、CourseLayout 自身拦截事件
+      * 3、NetLayout 自身拦截事件
       * 4、因为自身拦截事件，onInterceptTouchEvent() 不会再被调用
       * */
-      mItemTouchListener.forEach { listener ->
+      mItemTouchListener.forEachInline { listener ->
         if (listener.isBeforeIntercept(event, view)) {
           mBeforeInterceptingOnTouchListener = listener
           val cancelEvent = event.also { it.action = MotionEvent.ACTION_CANCEL }
@@ -132,7 +133,7 @@ class TouchDispatcher : ItemTouchListenerContainer {
             mAfterInterceptingOnTouchListener?.onTouchEvent(cancelEvent, view)
           }
           // 因为之前所有 listener 都通知了 Down 事件，所以需要全部都通知取消事件
-          mItemTouchListener.forEach {
+          mItemTouchListener.forEachInline {
             if (it !== listener) {
               it.isBeforeIntercept(cancelEvent, view)
             }
@@ -142,18 +143,21 @@ class TouchDispatcher : ItemTouchListenerContainer {
         }
       }
       
+      // 如果没有想提前拦截的，就会走到这里
+      
       if (mAfterInterceptingOnTouchListener != null) {
+        // 如果已经有之后拦截的，就直接把事件给他
         mAfterInterceptingOnTouchListener!!.onTouchEvent(event, view)
         return true
       }
       
       // 如果走了上面 mItemTouchListener 的遍历还是没人需要拦截，就调用 isAfterIntercept() 询问
-      mItemTouchListener.forEach { listener ->
+      mItemTouchListener.forEachInline { listener ->
         if (listener.isAfterIntercept(event, view)) {
           mAfterInterceptingOnTouchListener = listener
           val cancelEvent = event.also { it.action = MotionEvent.ACTION_CANCEL }
           // 因为之前所有 listener 都通知了 Down 事件，所以需要全部都通知取消事件
-          mItemTouchListener.forEach {
+          mItemTouchListener.forEachInline {
             if (it !== listener) {
               it.isAfterIntercept(cancelEvent, view)
             }

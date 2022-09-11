@@ -9,4 +9,5 @@ package com.ndhzs.netlayout.transition
  */
 interface ChildVisibleListenerContainer {
   fun addChildVisibleListener(listener: OnChildVisibleListener)
+  fun removeChildVisibleListener(listener: OnChildVisibleListener)
 }

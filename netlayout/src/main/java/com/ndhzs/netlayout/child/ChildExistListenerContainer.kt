@@ -9,4 +9,5 @@ package com.ndhzs.netlayout.child
  */
 interface ChildExistListenerContainer {
   fun addChildExistListener(listener: OnChildExistListener)
+  fun removeChildExitListener(listener: OnChildExistListener)
 }

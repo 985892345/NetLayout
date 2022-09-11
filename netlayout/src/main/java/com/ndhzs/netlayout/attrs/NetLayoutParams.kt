@@ -22,14 +22,14 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
    * 是否可以测量和布局，返回 false 时将不会给 View 布局和测量
    */
   open fun isComplete(viewRowCount: Int, viewColumnCount: Int): Boolean {
-    return startRow in 0..endRow
-      && startColumn in 0..endColumn
+    return startRow in 0 .. endRow
+      && startColumn in 0 .. endColumn
       && endRow < viewRowCount
       && endColumn < viewColumnCount
   }
   
   open fun contains(row: Int, column: Int): Boolean {
-    return row in startRow..endRow && column in startColumn..endColumn
+    return row in startRow .. endRow && column in startColumn .. endColumn
   }
   
   /**

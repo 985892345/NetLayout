@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.collection.ArrayMap
 import com.ndhzs.netlayout.transition.ILayoutTransition.TransitionType
+import com.ndhzs.netlayout.utils.forEachReversed
 
 /**
  * ## 背景
@@ -26,16 +27,20 @@ internal class LayoutTransitionHelper : LayoutTransition(), ChildVisibleListener
     mChildVisibleListeners.add(listener)
   }
   
+  override fun removeChildVisibleListener(listener: OnChildVisibleListener) {
+    mChildVisibleListeners.remove(listener)
+  }
+  
   override fun showChild(parent: ViewGroup, child: View, oldVisibility: Int) {
     super.showChild(parent, child, oldVisibility)
-    mChildVisibleListeners.forEach {
+    mChildVisibleListeners.forEachReversed {
       it.onShowView(parent, child, oldVisibility)
     }
   }
   
   override fun hideChild(parent: ViewGroup, child: View, newVisibility: Int) {
     super.hideChild(parent, child, newVisibility)
-    mChildVisibleListeners.forEach {
+    mChildVisibleListeners.forEachReversed {
       it.onHideView(parent, child, newVisibility)
     }
   }

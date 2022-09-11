@@ -7,10 +7,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.ArrayMap
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.collection.ArrayMap
 import com.ndhzs.netlayout.R
 import com.ndhzs.netlayout.child.OnChildExistListener
 import com.ndhzs.netlayout.child.ChildExistListenerContainer
@@ -25,6 +25,8 @@ import com.ndhzs.netlayout.transition.ChildVisibleListenerContainer
 import com.ndhzs.netlayout.transition.ILayoutTransition
 import com.ndhzs.netlayout.transition.LayoutTransitionHelper
 import com.ndhzs.netlayout.transition.OnChildVisibleListener
+import com.ndhzs.netlayout.utils.forEachInline
+import com.ndhzs.netlayout.utils.forEachReversed
 
 /**
  * 专门用于提供一些分发扩展的 ViewGroup
@@ -33,6 +35,7 @@ import com.ndhzs.netlayout.transition.OnChildVisibleListener
  * - 提供绘图的分发
  * - 提供在试图被摧毁时保存数据的接口
  * - 添加和删除子 View 的回调
+ * - 子 View visibility 改变的监听
  *
  * 因为提供了扩展，所以部分方法不允许重写
  *
@@ -62,6 +65,10 @@ open class NetLayout2 @JvmOverloads constructor(
     mItemDecoration.add(index, decor)
   }
   
+  final override fun removeItemDecoration(decor: ItemDecoration) {
+    mItemDecoration.remove(decor)
+  }
+  
   final override fun addItemTouchListener(listener: OnItemTouchListener) {
     mTouchDispatchHelper.addItemTouchListener(listener)
   }
@@ -78,6 +85,10 @@ open class NetLayout2 @JvmOverloads constructor(
   
   final override fun addChildExistListener(listener: OnChildExistListener) {
     mChildExistListener.add(listener)
+  }
+  
+  final override fun removeChildExitListener(listener: OnChildExistListener) {
+    mChildExistListener.remove(listener)
   }
   
   // 自定义绘图的监听
@@ -107,11 +118,11 @@ open class NetLayout2 @JvmOverloads constructor(
   }
   
   final override fun dispatchDraw(canvas: Canvas) {
-    mItemDecoration.forEach {
+    mItemDecoration.forEachReversed {
       it.onDrawBelow(canvas, this)
     }
     super.dispatchDraw(canvas)
-    mItemDecoration.forEach {
+    mItemDecoration.forEachReversed {
       it.onDrawAbove(canvas, this)
     }
   }
@@ -127,12 +138,12 @@ open class NetLayout2 @JvmOverloads constructor(
     super.onRestoreInstanceState(state.superState)
     mSaveBundleListenerCache.clear()
     // 再恢复 mSaveBundleListeners 的状态
-    state.saveBundleListeners.forEach {
-      val listener = mSaveBundleListeners[it.key]
+    state.saveBundleListeners.forEachInline { k, v ->
+      val listener = mSaveBundleListeners[k]
       if (listener != null) {
-        listener.onRestoreState(it.value)
+        listener.onRestoreState(v)
       } else {
-        mSaveBundleListenerCache[it.key] = it.value
+        mSaveBundleListenerCache[k] = v
       }
     }
   }
@@ -141,8 +152,8 @@ open class NetLayout2 @JvmOverloads constructor(
     val superState = super.onSaveInstanceState()
     val ss = NetSavedState(superState)
     // 保存 mSaveBundleListeners 的状态
-    mSaveBundleListeners.forEach {
-      ss.saveBundleListeners[it.key] = it.value.onSaveState()
+    mSaveBundleListeners.forEachInline { k, v ->
+      ss.saveBundleListeners[k] = v.onSaveState()
     }
     return ss
   }
@@ -151,8 +162,8 @@ open class NetLayout2 @JvmOverloads constructor(
    * 用于在布局被摧毁时保存必要的信息
    */
   open class NetSavedState : BaseSavedState {
-    val saveBundleListeners: ArrayMap<String, Parcelable?> =
-      ArrayMap() // 保存的 mSaveBundleListeners 的信息
+    // 保存的 mSaveBundleListeners 的信息
+    val saveBundleListeners: ArrayMap<String, Parcelable?> = ArrayMap()
     
     constructor(superState: Parcelable?) : super(superState)
     
@@ -179,20 +190,24 @@ open class NetLayout2 @JvmOverloads constructor(
   
   final override fun onViewAdded(child: View) {
     super.onViewAdded(child)
-    mChildExistListener.forEach {
+    mChildExistListener.forEachReversed {
       it.onChildViewAdded(this, child)
     }
   }
   
   final override fun onViewRemoved(child: View) {
     super.onViewRemoved(child)
-    mChildExistListener.forEach {
+    mChildExistListener.forEachReversed {
       it.onChildViewRemoved(this, child)
     }
   }
   
   final override fun addChildVisibleListener(listener: OnChildVisibleListener) {
     mLayoutTransition.addChildVisibleListener(listener)
+  }
+  
+  final override fun removeChildVisibleListener(listener: OnChildVisibleListener) {
+    mLayoutTransition.removeChildVisibleListener(listener)
   }
   
   private val mLayoutTransition = LayoutTransitionHelper()
