@@ -16,7 +16,7 @@ interface OnChildExistListener {
   /**
    * 添加子 View 的回调
    */
-  fun onChildViewAdded(parent: ViewGroup, child: View)
+  fun onChildViewAdded(parent: ViewGroup, child: View) {}
   
   /**
    * 移除子 View 时的回调
@@ -24,5 +24,5 @@ interface OnChildExistListener {
    * ## 注意
    * 这里是只要调用 removeView*() 就会回调
    */
-  fun onChildViewRemoved(parent: ViewGroup, child: View)
+  fun onChildViewRemoved(parent: ViewGroup, child: View) {}
 }

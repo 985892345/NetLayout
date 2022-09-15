@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent.Action.*
+import com.ndhzs.netlayout.utils.forEachInline
 
 /**
  * ##处理多指触摸的帮助类
@@ -70,13 +71,13 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   }
   
   override fun onDownEventRobbed(event: MotionEvent, view: ViewGroup) {
-    mDispatchers.forEach {
+    mDispatchers.forEachInline {
       it.onDownEventRobbed(event, view)
     }
   }
   
   override fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
-    mDispatchers.forEach {
+    mDispatchers.forEachInline {
       it.onDispatchTouchEvent(event, view)
     }
   }
@@ -97,9 +98,9 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
       }
       return null
     } else {
-      mDispatchers.forEach {
+      mDispatchers.forEachInline {
         if (it.isPrepareToIntercept(event, view)) {
-          mDispatchers.forEach { dispatcher ->
+          mDispatchers.forEachInline { dispatcher ->
             if (dispatcher !== it) {
               // 通知其他分发者，我抢夺了这个事件
               dispatcher.onOtherDispatcherRobbed(event, it)

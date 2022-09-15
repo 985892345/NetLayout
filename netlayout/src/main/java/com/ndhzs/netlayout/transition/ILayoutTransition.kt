@@ -53,7 +53,7 @@ interface ILayoutTransition {
    * 详见 [LayoutTransition.setAnimateParentHierarchy]
    *
    * 官方的默认值为 true，但由于 ViewPager2 在子 View 设置为 true 时会出现闪退，
-   * 所以本控件把默认值改为 false
+   * 所以本控件把默认值改为了 false
    *
    * 具体可看：
    * - https://developer.android.com/reference/androidx/viewpager2/widget/ViewPager2#setAdapter(androidx.recyclerview.widget.RecyclerView.Adapter)
@@ -69,22 +69,22 @@ interface ILayoutTransition {
   enum class TransitionType(val num: Int) {
     
     /**
-     * 添加子 View 和子 View 从 GONE 设置成 VISIBLE 时的动画
+     * 添加子 View 或子 View 从 GONE 设置成 VISIBLE 时的动画
      */
     CHANGE_APPEARING(LayoutTransition.CHANGE_APPEARING),
     
     /**
-     * 添加子 View 和子 View 设置成 GONE 时的动画
+     * 移除子 View 或子 View 设置成 GONE 时的动画
      */
     CHANGE_DISAPPEARING(LayoutTransition.CHANGE_DISAPPEARING),
     
     /**
-     * 添加子 View 和子 View 设置成 VISIBLE 时的动画
+     * 添加子 View 或子 View 设置成 VISIBLE 时的动画
      */
     APPEARING(LayoutTransition.APPEARING),
     
     /**
-     * 添加子 View 和子 View 设置成 GONE 或 INVISIBLE 时的动画
+     * 移除子 View 或子 View 设置成 GONE 或 INVISIBLE 时的动画
      */
     DISAPPEARING(LayoutTransition.DISAPPEARING),
     
