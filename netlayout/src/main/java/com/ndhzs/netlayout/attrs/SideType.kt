@@ -1,4 +1,4 @@
-package com.ndhzs.netlayout.utils
+package com.ndhzs.netlayout.attrs
 
 /**
  * 表示行还是列

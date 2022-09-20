@@ -230,17 +230,16 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     internal set
   
   @CallSuper
-  open fun changeLocation(other: INetBean): NetLayoutParams {
+  open fun changeLocation(other: INetBean) {
     _startRow = other.startRow
     _endRow = other.endRow
     _startColumn = other.startColumn
     _endColumn = other.endColumn
     initRowColumn()
-    return this
   }
   
   @CallSuper
-  open fun changeAll(other: NetLayoutParams): NetLayoutParams {
+  open fun changeAll(other: NetLayoutParams) {
     width = other.width
     height = other.height
     leftMargin = other.leftMargin
@@ -259,7 +258,6 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     constraintTop = other.constraintTop
     constraintBottom = other.constraintBottom
     initRowColumn()
-    return this
   }
   
   override fun equals(other: Any?): Boolean {

@@ -2,6 +2,7 @@ plugins {
   id("com.android.library")
   id("org.jetbrains.kotlin.android")
   `maven-publish`
+  signing
 }
 
 android {
@@ -28,13 +29,6 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
   }
-  publishing {
-    singleVariant("release")
-  }
-}
-
-configurations.all {
-  resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
 }
 
 dependencies {
@@ -46,17 +40,71 @@ dependencies {
   androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
 
+group = "io.github.985892345"
+version = "1.0.0-SNAPSHOT"
+val projectArtifact = "NetLayout"
+val projectGithubName = projectArtifact
+val projectDescription = "一个功能更全面的网状布局"
+
+android {
+  publishing {
+    singleVariant("release") {
+      withJavadocJar()
+      withSourcesJar()
+    }
+  }
+}
+
 afterEvaluate {
   publishing {
     publications {
-      // Creates a Maven publication called "release".
       create<MavenPublication>("release") {
+        groupId = project.group.toString()
+        artifactId = projectArtifact
+        version = project.version.toString()
         from(components["release"])
+        signing {
+          sign(this@create)
+        }
+        
+        pom {
+          name.set(projectArtifact)
+          description.set(projectDescription)
+          url.set("https://github.com/985892345/$projectGithubName")
+          
+          licenses {
+            license {
+              name.set("Apache-2.0 license")
+              url.set("https://github.com/985892345/$projectGithubName/blob/main/LICENSE")
+            }
+          }
+          
+          developers {
+            developer {
+              id.set("985892345")
+              name.set("GuoXiangrui")
+              email.set("guo985892345@formail.com")
+            }
+          }
+          
+          scm {
+            connection.set("https://github.com/985892345/$projectGithubName.git")
+            developerConnection.set("https://github.com/985892345/$projectGithubName.git")
+            url.set("https://github.com/985892345/$projectGithubName")
+          }
+        }
       }
       repositories {
         maven {
-          name = "Local"
-          url = uri("$buildDir/local")
+          // https://s01.oss.sonatype.org/
+          name = "mavenCentral" // 点击 publishReleasePublicationToMavenCentralRepository 发布到 mavenCentral
+          val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+          val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+          setUrl(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+          credentials {
+            username = project.properties["mavenCentralUsername"].toString()
+            password = project.properties["mavenCentralPassword"].toString()
+          }
         }
       }
     }

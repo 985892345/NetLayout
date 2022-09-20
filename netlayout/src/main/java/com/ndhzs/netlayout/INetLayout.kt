@@ -16,12 +16,12 @@ import com.ndhzs.netlayout.orientation.IRow
 interface INetLayout : IRow, IColumn {
   
   /**
-   * 添加一个子 View
+   * 添加一个子 view
    *
    * ## 注意
-   * - 内部进行了排序插入
+   * - 内部重写了 addView() 用了排序插入
    */
-  fun addItem(item: View, lp: NetLayoutParams)
+  fun addNetChild(child: View, lp: NetLayoutParams)
   
   /**
    * 倒序查找子 View

@@ -5,24 +5,6 @@
  [CourseViewLibrary](https://github.com/985892345/CourseViewLibrary) ，本项目是支撑整个课表的基础控件
 
 ## 添加依赖
-目前先使用 jitpack 依赖，后面有时间了再去弄 mavenCentral
-
-版本号：[![](https://jitpack.io/v/985892345/NetLayout.svg)](https://jitpack.io/#985892345/NetLayout)
-````kotlin
-// settings.gradle.kts
-dependencyResolutionManagement {
-  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-  repositories {
-    maven("https://jitpack.io")
-  }
-}
-
-// build.gradle.kts
-dependencies {
- implementation("com.github.985892345:NetLayout:xxx") // 版本号请看上方的 jitpack 标签
-}
-````
-
 目前还没有发布正式包，如果想提前体验，可以试试快照版本
 ````kotlin
 
@@ -32,6 +14,6 @@ configurations.all {
 }
 
 dependencies {
- implementation("com.github.985892345:NetLayout:master-SNAPSHOT")
+ implementation("io.github.985892345:NetLayout:1.0.0-SNAPSHOT")
 }
 ````

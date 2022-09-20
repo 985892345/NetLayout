@@ -1,6 +1,6 @@
 package com.ndhzs.netlayout.callback
 
-import com.ndhzs.netlayout.utils.SideType
+import com.ndhzs.netlayout.attrs.SideType
 
 /**
  * ...

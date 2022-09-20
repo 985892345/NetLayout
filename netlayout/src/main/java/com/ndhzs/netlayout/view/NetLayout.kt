@@ -17,7 +17,7 @@ import com.ndhzs.netlayout.attrs.NetLayoutAttrs
 import com.ndhzs.netlayout.attrs.NetLayoutParams
 import com.ndhzs.netlayout.orientation.IColumn
 import com.ndhzs.netlayout.orientation.IRow
-import com.ndhzs.netlayout.utils.SideType
+import com.ndhzs.netlayout.attrs.SideType
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -82,13 +82,8 @@ open class NetLayout @JvmOverloads constructor(
   override val columnCount: Int
     get() = mNetAttrs.columnCount
   
-  /**
-   * 添加一个 item
-   *
-   * 注意：[addView] 方法被重写，用于实现自定义顺序添加
-   */
-  override fun addItem(item: View, lp: NetLayoutParams) {
-    addView(item, lp)
+  override fun addNetChild(child: View, lp: NetLayoutParams) {
+    addView(child, lp)
   }
   
   override fun findViewUnderByXY(x: Int, y: Int): View? {
