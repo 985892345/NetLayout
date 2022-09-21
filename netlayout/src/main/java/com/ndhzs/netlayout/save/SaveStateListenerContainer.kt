@@ -1,8 +1,5 @@
 package com.ndhzs.netlayout.save
 
-import com.ndhzs.netlayout.draw.ItemDecoration
-import com.ndhzs.netlayout.touch.OnItemTouchListener
-
 /**
  * 提供自定义保存必要状态的 Provider
  *
@@ -17,7 +14,6 @@ import com.ndhzs.netlayout.touch.OnItemTouchListener
 interface SaveStateListenerContainer {
   
   /**
-   * 可用于在 [ItemDecoration] 和 [OnItemTouchListener] 中，View 即将被摧毁时保存一些必要的信息
    * @param tag 唯一标记，请尽可能的不要重复
    * @param listener 与 [tag] 对应的监听
    */

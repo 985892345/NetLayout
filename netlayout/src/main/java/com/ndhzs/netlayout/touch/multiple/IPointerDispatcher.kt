@@ -18,6 +18,7 @@ import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
  * @date 2022/2/17 10:57
  */
 interface IPointerDispatcher {
+  
   /**
    * 是否准备拦截，如果返回 true 的话，则将会把当前手指对应的事件以后都直接分发给自己
    *
@@ -29,13 +30,14 @@ interface IPointerDispatcher {
    * 得到该哪个 [IPointerTouchHandler] 处理事件
    *
    * - 如果 [isPrepareToIntercept] 返回 true 后，则立马会调用该函数
-   * - 如果需要延后才能处理事件，则可以返回 null
-   * - 如果你一直放回 null，该事件可以被后面的子 View 处理，一直等到你不返回 null
+   * - 如果需要延后才能处理事件，则可以返回 null，此时下面的子 View 可以收到这次事件 (如果没有被其他 [IPointerTouchHandler] 拦截)
    */
   fun getInterceptHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler?
   
   /**
    * Down 事件中，被顺序在前面的 [OnItemTouchListener] 拦截时回调
+   *
+   * 整个 [MultiTouchDispatcherHelper] 就是 [OnItemTouchListener] 的实现类，所以存在被其他 [OnItemTouchListener] 拦截的情况
    *
    * 只能接收到 Down 事件
    */
@@ -52,7 +54,8 @@ interface IPointerDispatcher {
   /**
    * 当事件被某个分发者准备拦截时回调
    *
-   * **注意:** 是准备拦截时回调，准备拦截并不一定是立马就处理，它可能延时处理，事件仍能分发下去
+   * **注意:** 是准备拦截时回调，即 [isPrepareToIntercept] 返回 true，
+   * 但准备拦截并不一定是立马就处理，即 [getInterceptHandler] 返回 null
    */
   fun onOtherDispatcherRobbed(event: IPointerEvent, dispatcher: IPointerDispatcher) {}
 }

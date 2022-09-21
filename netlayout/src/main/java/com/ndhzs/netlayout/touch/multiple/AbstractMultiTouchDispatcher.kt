@@ -67,7 +67,7 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
             mHandlerById.put(id, handler)
             isIntercept = true
             /*
-            * 按照原生事件分发的逻辑，OnInterceptTouchEvent() 的 MOVE 拦截后，是不会立即回调 onTouchEvent()
+            * 按照原生的事件分发逻辑，在 OnInterceptTouchEvent() 的 MOVE 中拦截时，不会立即回调 onTouchEvent()
             * 所以这里也遵守该规则
             * */
           }
@@ -129,7 +129,10 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
             if (handler != null) {
               onPointerEventRobbed(pointerEvent, handler, view)
               mHandlerById.put(id, handler)
-              handler.onPointerTouchEvent(pointerEvent, view)
+              /*
+              * 按照原生的事件分发逻辑，在 OnInterceptTouchEvent() 的 MOVE 中拦截时，不会立即回调 onTouchEvent()
+              * 所以这里也遵守该规则
+              * */
             }
           } else {
             handler.onPointerTouchEvent(pointerEvent, view)
@@ -186,7 +189,7 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
    *
    * **NOTE:** UP 和 CANCEL 是不会被回调的
    * - UP 事件会直接给 [IPointerTouchHandler] 处理，如果没得就会回调 [onUpEventWithoutHandler]
-   * - CANCEL 事件也会直接给 [IPointerTouchHandler] 处理，如果没得就会回调 [onPointerEventRobbed]
+   * - CANCEL 事件也会直接给 [IPointerTouchHandler] 处理，如果没得会回调 [onPointerEventRobbed]
    */
   protected abstract fun getInterceptHandler(
     event: IPointerEvent,
@@ -197,7 +200,8 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
    * 当前手指的事件被抢夺时回调
    * - 当前手指被某个处理者绑定时，回调，事件类型为 DOWN(包括 POINTER_DOWN) 或 MOVE
    * - 被前面的 [OnItemTouchListener] 拦截时，回调，事件类型为 CANCEL
-   * - 被外布局拦截且当前 手指无 handler 时回调，事件类型为 CANCEL，此时 [handler] = null
+   * - 被外布局拦截且当前手指无 handler 时回调，事件类型为 CANCEL，此时 [handler] = null
+   *   (如果当前手指有 handler 则直接回调 [IPointerTouchHandler.onPointerTouchEvent] 了)
    */
   protected abstract fun onPointerEventRobbed(
     event: IPointerEvent,
@@ -207,6 +211,8 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   
   /**
    * 当前手指还没有绑定处理者就抬起时的回调
+   *
+   * 只会收到 POINTER_UP 和 UP 事件
    */
   protected abstract fun onUpEventWithoutHandler(
     event: IPointerEvent,

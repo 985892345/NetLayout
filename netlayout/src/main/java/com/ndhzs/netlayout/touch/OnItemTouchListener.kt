@@ -1,21 +1,18 @@
 package com.ndhzs.netlayout.touch
 
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 
 /**
- * 该类主要用于实现一些简单的触摸事件处理，将一个 View 的复杂的触摸功能分为几个 listener 的来实现，
- * 增强代码可读性和维护性
+ * 该类用于分离一个 ViewGroup 的事件
  *
- * 设计参考了 RV 的 ItemTouchListener，但与它又有些不同。RV 的 ItemTouchListener 是想实现像 View 一般的事件
- * 监听，而针对于课表的需求，我更改为了一种更好的思路来分配事件
+ * 设计参考了 RV 的 ItemTouchListener
  *
+ * # 总的事件分发流程图如下：
  * ```
- *
  * 例如：共设置了 3 个 listener，分别为 l1、l2、l3，且按顺序添加
  *
- * 一、View.dispatchTouchEvent: 事件总分发的地方
+ * 一、View.dispatchTouchEvent: 事件分发的起点
  *   DOWN、MOVE
  *       ↓
  *       ↓
@@ -31,7 +28,7 @@ import android.view.ViewGroup
  *       ↓
  *       ↓
  *       ↓
- *   l1.isBeforeIntercept() → → → → → → → → l2.isBeforeIntercept() → → → → → → l3.isBeforeIntercept()
+ *   l1.isBeforeIntercept() → → → → → → → → l2.isBeforeIntercept() → → → → → → l3.isBeforeIntercept() → → → → → → 子 View
  *       ↓                     false            ↓                     false         ↓
  *       ↓ true                                 ↓ true                              ↓ true
  *       ↓                                      ↓                                   ↓
@@ -53,7 +50,7 @@ import android.view.ViewGroup
  *       ↓      将把该 listener 赋值给 mBeforeInterceptingOnTouchListener
  *       ↓           这里可以拦截已经被子 View 拦截的事件
  *       ↓
- *   l1.isBeforeIntercept() → → → → → → l2.isBeforeIntercept() → → → → → → l3.isBeforeIntercept()
+ *   l1.isBeforeIntercept() → → → → → → l2.isBeforeIntercept() → → → → → → l3.isBeforeIntercept() → → → → → → 子 View
  *       ↓                     false         ↓                     false         ↓
  *       ↓ true                              ↓ true                              ↓ true
  *       ↓                                   ↓                                   ↓
@@ -69,7 +66,7 @@ import android.view.ViewGroup
  *                                                                        l2.isBeforeIntercept(CANCEL)
  *
  *
- * 三、View.onTouchEvent:
+ * 三、View.onTouchEvent: 自身拦截了事件的地方
  * 1、DOWN: 在 mBeforeInterceptingOnTouchListener = null 时，
  *       ↓       则某一个 listener 的 isAfterIntercept() 返回 true 后，将把该 listener 赋值给 mAfterInterceptingOnTouchListener
  *       ↓  在 != null 时，
@@ -97,14 +94,14 @@ import android.view.ViewGroup
  *                                     l3.onCancelDownEvent
  *
  *
- * 2、MOVE: 如果有提前拦截的 mAdvanceInterceptingOnTouchListener，就直接交给它处理
- *       ↓      没有就会询问一遍是否有 listener 要提前拦截，有的话就赋值给 mAdvanceInterceptingOnTouchListener
- *       ↓           如果询问完后都没有，这时才会把事件交给 mInterceptingOnTouchListener 处理
+ * 2、MOVE: 如果有提前拦截的 mBeforeInterceptingOnTouchListener，就直接交给它处理，然后结束这次 Move
+ *       ↓      如果没有的话就会询问一遍是否有 listener 需要提前拦截，有的话就赋值给 mBeforeInterceptingOnTouchListener
+ *       ↓           如果询问完后都没有的话，此时才会把事件交给 mAfterInterceptingOnTouchListener 处理
  *       ↓
- *       ↓                                              false
+ *       ↓                                             false
  *   if (mBeforeInterceptingOnTouchListener == null) --------> mBeforeInterceptingOnTouchListener.onTouchEvent()
  *       ↓
- *       ↓ true  接下来会重新走一遍在 View.onInterceptTouchEvent 中 Move 的逻辑
+ *       ↓ true  接下来会重新走一遍在 View.onInterceptTouchEvent 中 Move 的逻辑，但结尾时不再把事件给子 View
  *       ↓
  *   l1.isBeforeIntercept() → → → → → → l2.isBeforeIntercept() → → → → → → l3.isBeforeIntercept() → → → → → → mAfterInterceptingOnTouchListener == null → → → → → → mAfterInterceptingOnTouchListener.onTouchEvent(event, view)
  *       ↓                     false         ↓                    false          ↓                   false                   ↓                             false
@@ -156,7 +153,7 @@ interface OnItemTouchListener {
   /**
    * 处理事件
    *
-   * 可以接收到 Down、Move、UP、Cancel
+   * 可以接收到 Down、Move、Up、Cancel
    */
   fun onTouchEvent(event: MotionEvent, view: ViewGroup)
   
@@ -171,7 +168,7 @@ interface OnItemTouchListener {
    * 在 ViewGroup 的 dispatchTouchEvent() 中调用，即事件分发下来时就回调，
    * 每一个 [OnItemTouchListener] 都可以收到
    *
-   * 可以接收到 Down、Move、UP、Cancel
+   * 可以接收到 Down、Move、Up、Cancel
    */
   fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
 }

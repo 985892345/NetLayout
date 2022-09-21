@@ -8,7 +8,7 @@ import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent.Action.*
 import com.ndhzs.netlayout.utils.forEachInline
 
 /**
- * ##处理多指触摸的帮助类
+ * ## 处理多指触摸的帮助类
  *
  * 该类作用：
  * - 将事件分发给需要拦截的 [IPointerDispatcher]，让他们来决定同一种类型的事件谁来处理
@@ -48,7 +48,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     view: ViewGroup
   ) {
     if (event.action == CANCEL) {
-      // 为 CANCEL 的时候，说明被前一个 OnItemTouchListener 拦截或者被外布局拦截
+      // 为 CANCEL 的时候，说明被前一个 OnItemTouchListener 或者外布局拦截
       // 这个时候通知还在等待的 dispatcher 取消事件，以 CANCEL 的形式通知
       val dispatcher = mDelayDispatchers.get(event.pointerId, null)
       if (dispatcher != null) {
@@ -62,7 +62,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     event: IPointerEvent,
     view: ViewGroup
   ) {
-    // 这里是当前手指没有任何处理者处理
+    // 这里是当前手指没有任何处理者处理时
     val dispatcher = mDelayDispatchers.get(event.pointerId, null)
     if (dispatcher != null) {
       dispatcher.isPrepareToIntercept(event, view) // 通知之前准备拦截的 dispatcher 取消事件
@@ -124,7 +124,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   /**
    * 询问是否还有其他的处理者想要处理的
    *
-   * 如果没有任何一个 dispatcher 想要拦截，则会回调该方法，一般用于在子类中重写这个方法给特殊的处理者处理
+   * 如果没有任何一个 dispatcher 想要拦截，则会回调该方法，一般用于在子类中重写该方法给特殊的处理者处理
    */
   protected open fun getDefaultTouchHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler? =
     null
