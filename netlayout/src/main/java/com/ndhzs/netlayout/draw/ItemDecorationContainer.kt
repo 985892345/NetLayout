@@ -1,7 +1,7 @@
 package com.ndhzs.netlayout.draw
 
 /**
- * 提供自定义绘图监听的 Provider
+ * 提供自定义绘制监听的 Provider
  *
  * @author 985892345 (Guo Xiangrui)
  * @email 2767465918@qq.com

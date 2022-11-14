@@ -2,7 +2,7 @@
 <resources>
 
     <declare-styleable name="NetLayout">
-        <!--是否处于 debug，如果处于的话，会绘制表格-->
+        <!--是否处于 debug，如果处于的话，会绘制表格线-->
         <attr name="net_isDebug" format="boolean"/>
         <!--总行数-->
         <attr name="net_rowCount" format="integer"/>

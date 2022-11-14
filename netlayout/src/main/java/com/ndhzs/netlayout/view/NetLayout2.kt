@@ -32,7 +32,7 @@ import com.ndhzs.netlayout.utils.forEachReversed
  * 专门用于提供一些分发扩展的 ViewGroup
  *
  * - 可扩展事件分发
- * - 提供绘图的分发
+ * - 提供绘制的分发
  * - 提供在试图被摧毁时保存数据的接口
  * - 添加和删除子 View 的回调
  * - 子 View visibility 改变的监听

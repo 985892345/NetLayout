@@ -41,10 +41,11 @@ dependencies {
 }
 
 group = "io.github.985892345"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 val projectArtifact = "NetLayout"
 val projectGithubName = projectArtifact
 val projectDescription = "一个功能更全面的网状布局"
+val projectMainBranch = "master"
 
 android {
   publishing {
@@ -75,7 +76,7 @@ afterEvaluate {
           licenses {
             license {
               name.set("Apache-2.0 license")
-              url.set("https://github.com/985892345/$projectGithubName/blob/main/LICENSE")
+              url.set("https://github.com/985892345/$projectGithubName/blob/$projectMainBranch/LICENSE")
             }
           }
           
