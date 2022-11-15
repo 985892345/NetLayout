@@ -109,6 +109,11 @@ interface INetLayout : IRow, IColumn {
    * 设置行或列比重被修改的监听
    */
   fun addOnWeightChangeListener(l: OnWeightChangeListener)
+  
+  /**
+   * 删除监听
+   */
+  fun removeOnWeightChangeListener(l: OnWeightChangeListener)
 }
 ```
 

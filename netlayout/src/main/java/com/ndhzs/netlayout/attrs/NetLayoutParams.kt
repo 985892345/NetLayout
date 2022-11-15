@@ -19,7 +19,7 @@ import java.util.*
 open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<NetLayoutParams> {
   
   /**
-   * 是否可以测量和布局，返回 false 时将不会给 View 布局和测量
+   * 是否可以测量和布局，返回 false 时将不会给 View 测量和布局
    */
   open fun isComplete(viewRowCount: Int, viewColumnCount: Int): Boolean {
     return startRow in 0 .. endRow

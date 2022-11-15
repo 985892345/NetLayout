@@ -18,6 +18,7 @@ import com.ndhzs.netlayout.attrs.NetLayoutParams
 import com.ndhzs.netlayout.orientation.IColumn
 import com.ndhzs.netlayout.orientation.IRow
 import com.ndhzs.netlayout.attrs.SideType
+import com.ndhzs.netlayout.utils.forEachReversed
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -199,7 +200,7 @@ open class NetLayout @JvmOverloads constructor(
       weight == 1F -> mColumnChangedWeight.remove(column)
       weight >= 0F -> mColumnChangedWeight[column] = weight
     }
-    mOnWeightChangeListeners.forEach {
+    mOnWeightChangeListeners.forEachReversed {
       it.onChange(old, weight, column, SideType.COLUMN)
     }
     requestLayout()
@@ -214,7 +215,7 @@ open class NetLayout @JvmOverloads constructor(
       weight == 1F -> mRowChangedWeight.remove(row)
       weight >= 0F -> mRowChangedWeight[row] = weight
     }
-    mOnWeightChangeListeners.forEach {
+    mOnWeightChangeListeners.forEachReversed {
       it.onChange(old, weight, row, SideType.ROW)
     }
     requestLayout()
@@ -287,6 +288,10 @@ open class NetLayout @JvmOverloads constructor(
   
   override fun addOnWeightChangeListener(l: OnWeightChangeListener) {
     mOnWeightChangeListeners.add(l)
+  }
+  
+  override fun removeOnWeightChangeListener(l: OnWeightChangeListener) {
+    mOnWeightChangeListeners.remove(l)
   }
   
   override fun syncColumnWeight(layout: IColumn): Boolean {
@@ -772,10 +777,12 @@ open class NetLayout @JvmOverloads constructor(
   protected fun LayoutParams.net(): NetLayoutParams = this as NetLayoutParams
   
   companion object {
-    private val DEBUG_LINE_PAINT = Paint().apply {
-      color = Color.BLACK
-      style = Paint.Style.STROKE
-      strokeWidth = 2F
+    private val DEBUG_LINE_PAINT by lazy {
+      Paint().apply {
+        color = Color.BLACK
+        style = Paint.Style.STROKE
+        strokeWidth = 2F
+      }
     }
   }
 }
