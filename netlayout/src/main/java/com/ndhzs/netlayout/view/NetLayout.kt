@@ -47,10 +47,10 @@ import kotlin.math.roundToInt
  *         android:layout_width="match_parent"
  *         android:layout_height="match_parent"
  *         app:net_layout_gravity="center"
- *         app:net_startRow="0"
- *         app:net_endRow="1"
- *         app:net_startColumn="0"
- *         app:net_endColumn="2"/>
+ *         app:net_layout_startRow="0"
+ *         app:net_layout_endRow="1"
+ *         app:net_layout_startColumn="0"
+ *         app:net_layout_endColumn="2"/>
  *
  *     填写 net_startRow、net_endRow、net_startColumn、net_endColumn 后
  *     1、这个 View 将会被限制在坐标 (0, 0) - (1, 2) 方格以内进行测量和摆放

@@ -41,10 +41,10 @@ dependencies {
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:net_layout_gravity="center"
-        app:net_startRow="0"
-        app:net_endRow="1"
-        app:net_startColumn="0"
-        app:net_endColumn="2"/>
+        app:net_layout_startRow="0"
+        app:net_layout_endRow="1"
+        app:net_layout_startColumn="0"
+        app:net_layout_endColumn="2"/>
 </NetLayout>
 ```
 
@@ -61,10 +61,10 @@ dependencies {
 | 属性               | 作用                                  |
 | ------------------ | ------------------------------------- |
 | net_layout_gravity | 与 FrameLayout 的 layout_gravity 一致 |
-| net_startRow       | 开始行的索引值，以 0 开始             |
-| net_endRow         | 结束行的索引值，以 0 开始             |
-| net_startColumn    | 开始列的索引值，以 0 开始             |
-| net_endColumn      | 结束列的索引值，以 0 开始             |
+| net_layout_startRow       | 开始行的索引值，以 0 开始             |
+| net_layout_endRow         | 结束行的索引值，以 0 开始             |
+| net_layout_startColumn    | 开始列的索引值，以 0 开始             |
+| net_layout_endColumn      | 结束列的索引值，以 0 开始             |
 
 ### 方法
 
