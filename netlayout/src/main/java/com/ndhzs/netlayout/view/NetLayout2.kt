@@ -1,6 +1,5 @@
 package com.ndhzs.netlayout.view
 
-import android.animation.Animator
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,7 +21,6 @@ import com.ndhzs.netlayout.draw.ItemDecorationContainer
 import com.ndhzs.netlayout.save.SaveStateListenerContainer
 import com.ndhzs.netlayout.touch.ItemTouchListenerContainer
 import com.ndhzs.netlayout.transition.ChildVisibleListenerContainer
-import com.ndhzs.netlayout.transition.ILayoutTransition
 import com.ndhzs.netlayout.transition.LayoutTransitionHelper
 import com.ndhzs.netlayout.transition.OnChildVisibleListener
 import com.ndhzs.netlayout.utils.forEachInline
@@ -49,12 +47,11 @@ open class NetLayout2 @JvmOverloads constructor(
   defStyleAttr: Int = R.attr.netLayoutStyle,
   defStyleRes: Int = 0
 ) : NetLayout(context, attrs, defStyleAttr, defStyleRes),
-  ItemDecorationContainer,
-  ItemTouchListenerContainer,
-  SaveStateListenerContainer,
-  ChildExistListenerContainer,
-  ChildVisibleListenerContainer,
-  ILayoutTransition
+  ItemDecorationContainer, // 自定义绘制监听
+  ItemTouchListenerContainer, // 自定义事件分发
+  SaveStateListenerContainer, // View 被重建的回调，可用于保存重要数据
+  ChildExistListenerContainer, // 添加和删除子 View 的回调
+  ChildVisibleListenerContainer // 子 View 可见性改变的回调
 {
   
   final override fun addItemDecoration(decor: ItemDecoration) {
@@ -210,51 +207,19 @@ open class NetLayout2 @JvmOverloads constructor(
     mLayoutTransition.removeChildVisibleListener(listener)
   }
   
-  private val mLayoutTransition = LayoutTransitionHelper()
+  // 自定义 LayoutTransition，用于实现 OnChildVisibleListener
+  private val mLayoutTransition = LayoutTransitionHelper().apply {
+    super.setLayoutTransition(this)
+  }
   
-  @Deprecated("不支持该方法", ReplaceWith("使用 ILayoutTransition 的方法代替"), DeprecationLevel.HIDDEN)
+  @Deprecated("不支持自定义 LayoutTransition", ReplaceWith("请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置"), DeprecationLevel.HIDDEN)
   final override fun setLayoutTransition(transition: LayoutTransition?) {
-    throw IllegalArgumentException("${this::class.simpleName} 不支持 setLayoutTransition()，请使用 INetLayoutTransition 的方法代替")
+    // 官方没有提供可用的父布局监听子布局 Visibility 的回调
+    // 为了实现 OnChildVisibleListener，采取了 LayoutTransition 来监听
+    throw IllegalArgumentException("${this::class.simpleName} 不支持 setLayoutTransition()，请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置")
   }
   
-  final override fun getLayoutTransition(): LayoutTransition? {
-    return null
-  }
-  
-  init {
-    super.setLayoutTransition(mLayoutTransition)
-    mLayoutTransition.setAnimateParentHierarchy(false)
-  }
-  
-  final override fun addAnimator(type: ILayoutTransition.TransitionType, animator: Animator?) {
-    mLayoutTransition.addAnimator(type, animator)
-  }
-  
-  final override fun setDuration(type: ILayoutTransition.TransitionType, duration: Long) {
-    mLayoutTransition.setDuration(type, duration)
-  }
-  
-  final override fun getDuration(type: ILayoutTransition.TransitionType): Long {
-    return mLayoutTransition.getDuration(type)
-  }
-  
-  final override fun setStartDelay(type: ILayoutTransition.TransitionType, delay: Long) {
-    mLayoutTransition.setStartDelay(type, delay)
-  }
-  
-  final override fun getStartDelay(type: ILayoutTransition.TransitionType): Long {
-    return mLayoutTransition.getDuration(type)
-  }
-  
-  final override fun addTransitionListener(listener: ILayoutTransition.TransitionListener) {
-    mLayoutTransition.addTransitionListener(listener)
-  }
-  
-  final override fun removeTransitionListener(listener: ILayoutTransition.TransitionListener) {
-    mLayoutTransition.removeTransitionListener(listener)
-  }
-  
-  final override fun setAnimateParentHierarchy(animateParentHierarchy: Boolean) {
-    mLayoutTransition.setAnimateParentHierarchy(animateParentHierarchy)
+  final override fun getLayoutTransition(): LayoutTransition {
+    return mLayoutTransition
   }
 }

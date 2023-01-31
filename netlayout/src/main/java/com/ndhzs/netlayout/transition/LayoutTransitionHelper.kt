@@ -1,12 +1,8 @@
 package com.ndhzs.netlayout.transition
 
-import android.animation.Animator
-import android.animation.AnimatorSet
 import android.animation.LayoutTransition
 import android.view.View
 import android.view.ViewGroup
-import androidx.collection.ArrayMap
-import com.ndhzs.netlayout.transition.ILayoutTransition.TransitionType
 import com.ndhzs.netlayout.utils.forEachReversed
 
 /**
@@ -19,7 +15,7 @@ import com.ndhzs.netlayout.utils.forEachReversed
  * @email guo985892345@foxmail.com
  * @date 2022/9/8 13:05
  */
-internal class LayoutTransitionHelper : LayoutTransition(), ChildVisibleListenerContainer, ILayoutTransition {
+class LayoutTransitionHelper : LayoutTransition(), ChildVisibleListenerContainer {
   
   private val mChildVisibleListeners = ArrayList<OnChildVisibleListener>(3)
   
@@ -45,71 +41,20 @@ internal class LayoutTransitionHelper : LayoutTransition(), ChildVisibleListener
     }
   }
   
-  private val mChangingAppearingAnimSet = AnimatorSet()
-  private val mChangingDisappearingAnimSet = AnimatorSet()
-  private val mAppearingAnimSet = AnimatorSet()
-  private val mDisappearingAnim = AnimatorSet()
-  private val mChangingAnimSet = AnimatorSet()
-  
   init {
-    setAnimator(CHANGE_APPEARING, mChangingAppearingAnimSet)
-    setAnimator(CHANGE_DISAPPEARING, mChangingDisappearingAnimSet)
-    setAnimator(APPEARING, mAppearingAnimSet)
-    setAnimator(DISAPPEARING, mDisappearingAnim)
-    setAnimator(CHANGING, mChangingAnimSet)
-  }
+    // 取消所有的默认动画
+    setAnimator(CHANGE_APPEARING, null)
+    setAnimator(CHANGE_DISAPPEARING, null)
+    setAnimator(APPEARING, null)
+    setAnimator(DISAPPEARING, null)
+    setAnimator(CHANGING, null)
   
-  override fun addAnimator(type: TransitionType, animator: Animator?) {
-    when (type) {
-      TransitionType.CHANGE_APPEARING -> mChangingAppearingAnimSet.playTogether(animator)
-      TransitionType.CHANGE_DISAPPEARING -> mChangingDisappearingAnimSet.playTogether(animator)
-      TransitionType.APPEARING -> mAppearingAnimSet.playTogether(animator)
-      TransitionType.DISAPPEARING -> mDisappearingAnim.playTogether(animator)
-      TransitionType.CHANGING -> mChangingAnimSet.playTogether(animator)
-    }
-  }
-  
-  override fun setDuration(type: TransitionType, duration: Long) {
-    setDuration(type.num, duration)
-  }
-  
-  override fun getDuration(type: TransitionType): Long {
-    return getDuration(type.num)
-  }
-  
-  override fun setStartDelay(type: TransitionType, delay: Long) {
-    setStartDelay(type.num, delay)
-  }
-  
-  override fun getStartDelay(type: TransitionType): Long {
-    return getStartDelay(type.num)
-  }
-  
-  private val mListenerMap = ArrayMap<ILayoutTransition.TransitionListener, TransitionListener>()
-  
-  override fun addTransitionListener(listener: ILayoutTransition.TransitionListener) {
-    mListenerMap[listener] = object : TransitionListener {
-      override fun startTransition(
-        transition: LayoutTransition,
-        container: ViewGroup,
-        view: View,
-        transitionType: Int
-      ) {
-        listener.startTransition(TransitionType.getTypeFromNum(transitionType), container, view)
-      }
-  
-      override fun endTransition(
-        transition: LayoutTransition,
-        container: ViewGroup,
-        view: View,
-        transitionType: Int
-      ) {
-        listener.endTransition(TransitionType.getTypeFromNum(transitionType), container, view)
-      }
-    }
-  }
-  
-  override fun removeTransitionListener(listener: ILayoutTransition.TransitionListener) {
-    removeTransitionListener(mListenerMap.remove(listener))
+    /*
+    * 默认设置为 false，不然 Vp2 会闪退
+    * 具体可看：
+    * - https://developer.android.com/reference/androidx/viewpager2/widget/ViewPager2#setAdapter(androidx.recyclerview.widget.RecyclerView.Adapter)
+    * - https://stackoverflow.com/questions/59660691/java-lang-illegalstateexception-page-can-only-be-offset-by-a-positive-amount
+    * */
+    setAnimateParentHierarchy(false)
   }
 }

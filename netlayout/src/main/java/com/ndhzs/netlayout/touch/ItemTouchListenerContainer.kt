@@ -1,7 +1,7 @@
 package com.ndhzs.netlayout.touch
 
 /**
- * 提供定义事件分发的 Provider
+ * 提供自定义事件分发的 Provider
  *
  * 经过我的思考，我认为不应该提供删除的方法，原因如下：
  * - 一般不会有需要中途删除的情况
