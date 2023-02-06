@@ -52,8 +52,16 @@ interface IRow {
   /**
    * 设置第 [row] 行（以 0 开始）的***初始比重***
    *
-   * ## 作用
-   * 设置初始比例后，可以实现在每行高度都不变的情况下扩大整个布局的高度
+   * ## 用法举例
+   * ```
+   * 比如，自身 layout_height 为 wrap_content，同时设置了 minHeight = 6dp，
+   * 在只有 3 行的情况下，如果 setRowInitialWeight(1, 0),
+   * 此时实际显示高度为：6dp x 3 / 2 = 9dp
+   *                        ↓    \
+   *                  总的显示比重  \
+   *                               ↓
+   *               总的初始比重 1 + 0 + 1 第一行和第三行默认是 1
+   * ```
    *
    * ## 适用范围
    * 只有在 `onMeasure()` 中得到的高度测量模式不为 EXACTLY 才能触发
@@ -61,7 +69,7 @@ interface IRow {
    * ### 常见于以下情况：
    * - 自身 `layout_height` 为 `wrap_content`
    * - 父布局 `layout_height` 为 `wrap_content` 且自身 `layout_height` 为 `match_parent`
-   * - 父布局为 ScrollView、NestedScrollView、ListView(当自身 `layout_height` 为 `match_parent` 或 `wrap_content` 时)
+   * - 父布局为 `ScrollView`、`NestedScrollView`、`ListView`(当自身 `layout_height` 为 `match_parent` 或 `wrap_content` 时)
    *
    * ## 注意事项
    * 设置后并不会改变显示的比重，如果需要改变比重，请使用 [setRowShowWeight] 方法

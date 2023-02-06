@@ -3,6 +3,7 @@ package com.ndhzs.netlayout.touch.multiple
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.ViewGroup
+import androidx.core.util.forEach
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 import com.ndhzs.netlayout.touch.multiple.event.toPointerEvent
@@ -29,7 +30,6 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   final override fun isBeforeIntercept(event: MotionEvent, view: ViewGroup): Boolean {
     when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
-        mHandlerById.clear() // 防止出现意外
         val index = event.actionIndex
         val id = event.getPointerId(index)
         val pointerEvent = event.toPointerEvent(index, id)
@@ -182,6 +182,16 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   
   final override fun isAfterIntercept(event: MotionEvent, view: ViewGroup): Boolean = false
   
+  override fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
+    super.onDispatchTouchEvent(event, view)
+    if (event.action == MotionEvent.ACTION_DOWN) {
+      mHandlerById.clear()
+    }
+    mHandlerById.forEach { _, handler ->
+      handler.onDispatchTouchEvent(event, view)
+    }
+  }
+  
   /**
    * 得到想要处理当前手指事件的处理者，然后处理者会与当前手指进行一对一绑定
    *
@@ -218,4 +228,11 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
     event: IPointerEvent,
     view: ViewGroup
   )
+  
+  /**
+   * 得到 [pointerId] 对应的 [IPointerTouchHandler]
+   */
+  fun getTouchHandler(pointerId: Int): IPointerTouchHandler? {
+    return mHandlerById.get(pointerId)
+  }
 }

@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
-  compileSdk = 31
+  namespace = "com.ndhzs.netlayout.demo"
+  compileSdk = 33
 
   defaultConfig {
     applicationId = "com.ndhzs.netlayout"
     minSdk = 21
-    targetSdk = 31
+    targetSdk = 33
     versionCode = 1
     versionName = "1.0"
 

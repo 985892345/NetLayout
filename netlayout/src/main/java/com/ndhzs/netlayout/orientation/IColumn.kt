@@ -52,8 +52,16 @@ interface IColumn {
   /**
    * 设置第 [column] 列（以 0 开始）的***初始比重***
    *
-   * ## 作用
-   * 设置初始比例后，可以实现在每列宽度都不变的情况下扩大整个布局的宽度
+   * ## 用法举例
+   * ```
+   * 比如，自身 layout_width 为 wrap_content，同时设置了 minWidth = 6dp，
+   * 在只有 3 列的情况下，如果 setColumnInitialWeight(1, 0),
+   * 此时实际显示宽度为：6dp x 3 / 2 = 9dp
+   *                        ↓    \
+   *                  总的显示比重  \
+   *                               ↓
+   *               总的初始比重 1 + 0 + 1 第一列和第三列默认是 1
+   * ```
    *
    * ## 适用范围
    * 只有在 `onMeasure()` 中得到的宽度测量模式不为 EXACTLY 才能触发
@@ -61,7 +69,7 @@ interface IColumn {
    * ### 常见于以下情况：
    * - 自身 `layout_width` 为 `wrap_content`
    * - 父布局 `layout_width` 为 `wrap_content` 且自身 `layout_width` 为 `match_parent`
-   * - 父布局为 HorizontalScrollView
+   * - 父布局为 `HorizontalScrollView`
    *
    * ## 注意事项
    * 设置后并不会改变显示的比重，如果需要改变比重，请使用 [setColumnShowWeight] 方法

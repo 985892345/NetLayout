@@ -517,7 +517,7 @@ open class NetLayout @JvmOverloads constructor(
         val child = mMatchParentChildren[i]
         val lp = child.layoutParams.net()
         // 这里与 FrameLayout 源码差异有点大，我这里直接将整个子 View 的测量交给了 measureChildWithRatio 方法
-        // 提供的宽和高都是自身的，所以与 FrameLayout 的写法无本质区别
+        // 提供的宽和高都是自身的，与 FrameLayout 的写法无本质区别
         measureChildWithRatio(
           child,
           MeasureSpec.makeMeasureSpec(measuredWidth, MeasureSpec.EXACTLY),

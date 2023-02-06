@@ -52,19 +52,3 @@ internal fun MotionEvent.toPointerEvent(
   PointerEventImpl.pointerIndex = pointerIndex
   PointerEventImpl.pointerId = pointerId
 }
-
-/**
- * 用于在某特定范围内伪装某个事件，**内部使用方法，不建议私自调用**
- * ```
- * 如：
- *    mIPointerEvent.pretendEvent(MotionEvent.CANCEL) { it ->
- *        // 这里面的 it 将会变成 CANCEL 事件
- *    }
- * ```
- */
-internal inline fun IPointerEvent.pretendEvent(action: Int, func: (IPointerEvent) -> Unit) {
-  val originalAction = action
-  PointerEventImpl.event.action = action
-  func.invoke(event.toPointerEvent(pointerIndex, pointerId))
-  PointerEventImpl.event.action = originalAction
-}

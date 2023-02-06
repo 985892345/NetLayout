@@ -71,12 +71,14 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   }
   
   override fun onDownEventRobbed(event: MotionEvent, view: ViewGroup) {
+    super.onDownEventRobbed(event, view)
     mDispatchers.forEachInline {
       it.onDownEventRobbed(event, view)
     }
   }
   
   override fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
+    super.onDispatchTouchEvent(event, view)
     mDispatchers.forEachInline {
       it.onDispatchTouchEvent(event, view)
     }
