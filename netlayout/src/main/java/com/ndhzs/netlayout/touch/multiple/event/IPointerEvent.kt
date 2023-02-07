@@ -32,7 +32,7 @@ interface IPointerEvent {
 }
 
 /**
- * 用于在某特定范围内伪装某个事件，**内部使用方法，不建议私自调用**
+ * 用于在某特定范围内伪装某个事件
  * ```
  * 如：
  *    mIPointerEvent.pretendEvent(MotionEvent.CANCEL) { it ->
@@ -41,6 +41,10 @@ interface IPointerEvent {
  * ```
  */
 fun IPointerEvent.pretendEvent(action: Int, func: (IPointerEvent) -> Unit) {
+  pretendEventInline(action, func)
+}
+
+internal inline fun IPointerEvent.pretendEventInline(action: Int, func: (IPointerEvent) -> Unit) {
   val originalAction = action
   PointerEventImpl.event.action = action
   func.invoke(event.toPointerEvent(pointerIndex, pointerId))

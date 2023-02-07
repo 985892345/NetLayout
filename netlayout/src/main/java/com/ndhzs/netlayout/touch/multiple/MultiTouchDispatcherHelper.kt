@@ -3,6 +3,7 @@ package com.ndhzs.netlayout.touch.multiple
 import android.util.SparseArray
 import android.view.MotionEvent
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent.Action.*
 import com.ndhzs.netlayout.utils.forEachInline
@@ -30,6 +31,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   // 延迟拦截当前手指事件的分发者
   private val mDelayDispatchers = SparseArray<IPointerDispatcher>(5)
   
+  @CallSuper
   override fun getInterceptHandler(
     event: IPointerEvent,
     view: ViewGroup
@@ -42,6 +44,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     return null
   }
   
+  @CallSuper
   override fun onPointerEventRobbed(
     event: IPointerEvent,
     handler: IPointerTouchHandler?,
@@ -58,6 +61,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     }
   }
   
+  @CallSuper
   override fun onUpEventWithoutHandler(
     event: IPointerEvent,
     view: ViewGroup
@@ -70,6 +74,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     }
   }
   
+  @CallSuper
   override fun onDownEventRobbed(event: MotionEvent, view: ViewGroup) {
     super.onDownEventRobbed(event, view)
     mDispatchers.forEachInline {
@@ -77,6 +82,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     }
   }
   
+  @CallSuper
   override fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
     super.onDispatchTouchEvent(event, view)
     mDispatchers.forEachInline {

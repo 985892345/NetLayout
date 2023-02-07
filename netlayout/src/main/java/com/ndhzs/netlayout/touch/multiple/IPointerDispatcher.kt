@@ -23,14 +23,20 @@ interface IPointerDispatcher {
    * 是否准备拦截，如果返回 true 的话，则将会把当前手指对应的事件以后都直接分发给自己
    *
    * 可以接收到 Down、Move、UP、Cancel
+   *
+   * - 该函数只有一次返回 true 的机会
+   * - 如果 [getInterceptHandler] 直到 UP 或 CANCEL 前一直返回 null，则会回调 UP 或 CANCEL 事件
    */
   fun isPrepareToIntercept(event: IPointerEvent, view: ViewGroup): Boolean
   
   /**
    * 得到该哪个 [IPointerTouchHandler] 处理事件
    *
+   * 可以接收到的事件取决于 [isPrepareToIntercept] 什么时候返回 true
+   *
    * - 如果 [isPrepareToIntercept] 返回 true 后，则立马会调用该函数
    * - 如果需要延后才能处理事件，则可以返回 null，此时下面的子 View 可以收到这次事件 (如果没有被其他 [IPointerTouchHandler] 拦截)
+   * - 该函数只有一次返回 非 null 值的机会
    */
   fun getInterceptHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler?
   

@@ -102,7 +102,9 @@ open class NetLayout2 @JvmOverloads constructor(
   
   final override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     mTouchDispatchHelper.dispatchTouchEvent(ev, this)
-    return super.dispatchTouchEvent(ev)
+    val boolean = super.dispatchTouchEvent(ev)
+    mTouchDispatchHelper.afterDispatchTouchEvent(ev, this)
+    return boolean
   }
   
   final override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
@@ -112,6 +114,11 @@ open class NetLayout2 @JvmOverloads constructor(
   @SuppressLint("ClickableViewAccessibility")
   final override fun onTouchEvent(event: MotionEvent): Boolean {
     return mTouchDispatchHelper.onTouchEvent(event, this)
+  }
+  
+  final override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+    super.requestDisallowInterceptTouchEvent(disallowIntercept)
+    mTouchDispatchHelper.requestDisallowInterceptTouchEvent(disallowIntercept, this)
   }
   
   final override fun dispatchDraw(canvas: Canvas) {

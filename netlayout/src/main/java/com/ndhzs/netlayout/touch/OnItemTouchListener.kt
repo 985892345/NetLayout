@@ -136,6 +136,10 @@ interface OnItemTouchListener {
    * 与 onInterceptTouchEvent 完全一样，**只有一次返回 true 的机会**，返回后就不会再次调用
    *
    * 可以接收到 Down、Move、UP、Cancel
+   *
+   * ## 注意
+   * - 如果子 View 调用了 requestDisallowInterceptTouchEvent()， 会导致 部分 MOVE、UP 和 CANCEL 无法回调，
+   * 请重写 [onRequestDisallowInterceptTouchEvent] 进行处理
    */
   fun isBeforeIntercept(event: MotionEvent, view: ViewGroup): Boolean = false
   
@@ -171,4 +175,17 @@ interface OnItemTouchListener {
    * 可以接收到 Down、Move、Up、Cancel
    */
   fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
+  
+  /**
+   * 在 ViewGroup 的 dispatchTouchEvent() 调用后调用，此时处于事件向上返回的过程，
+   * 每一个 [OnItemTouchListener] 都可以收到
+   *
+   * 可以接收到 Down、Move、Up、Cancel
+   */
+  fun onAfterDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
+  
+  /**
+   * 设置了 requestDisallowInterceptTouchEvent 的回调
+   */
+  fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean, view: ViewGroup) {}
 }

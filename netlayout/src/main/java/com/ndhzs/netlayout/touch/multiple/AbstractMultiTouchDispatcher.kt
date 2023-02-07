@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.util.forEach
 import com.ndhzs.netlayout.touch.OnItemTouchListener
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
+import com.ndhzs.netlayout.touch.multiple.event.pretendEventInline
 import com.ndhzs.netlayout.touch.multiple.event.toPointerEvent
 
 /**
@@ -17,7 +18,7 @@ import com.ndhzs.netlayout.touch.multiple.event.toPointerEvent
  * 该操作分为：DOWN、MOVE、UP、CANCEL 四个事件，就像你直接使用 event.action 来处理事件的逻辑一样，
  * 其中我把事件分发进行了一层封装，把每个手指的事件交给 [IPointerTouchHandler] 来处理
  *
- * 该类的分发逻辑虽然不能绝对保证，但 99% 是完善的，如果你对一般的事件处理都不熟悉，建议你先熟悉了再来看
+ * 如果你对一般的事件处理都不熟悉，建议你先熟悉了再来看
  *
  * @author 985892345 (Guo Xiangrui)
  * @email 2767465918@qq.com
@@ -186,10 +187,39 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
     super.onDispatchTouchEvent(event, view)
     if (event.action == MotionEvent.ACTION_DOWN) {
       mHandlerById.clear()
+      mIsDisallowIntercept = false
     }
     mHandlerById.forEach { _, handler ->
       handler.onDispatchTouchEvent(event, view)
     }
+  }
+  
+  override fun onAfterDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
+    super.onAfterDispatchTouchEvent(event, view)
+    when (event.action) {
+      MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
+        if (mIsDisallowIntercept) {
+          /**
+           * 此时说明事件被子 View 处理，并且调用了 requestDisallowInterceptTouchEvent() 直到手指抬起
+           * 导致 [isBeforeIntercept] 不会被回调，所以需要单独以 CANCEL 的形式调用 [onPointerEventRobbed]
+           */
+          for (index in 0 until event.pointerCount) {
+            val id = event.getPointerId(index)
+            val pointerEvent = event.toPointerEvent(index, id)
+            pointerEvent.pretendEventInline(MotionEvent.ACTION_CANCEL) {
+              onPointerEventRobbed(pointerEvent, null, view)
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  private var mIsDisallowIntercept = false
+  
+  override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean, view: ViewGroup) {
+    super.onRequestDisallowInterceptTouchEvent(disallowIntercept, view)
+    mIsDisallowIntercept = disallowIntercept
   }
   
   /**
@@ -208,10 +238,11 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
   
   /**
    * 当前手指的事件被抢夺时回调
-   * - 当前手指被某个处理者绑定时，回调，事件类型为 DOWN(包括 POINTER_DOWN) 或 MOVE
-   * - 被前面的 [OnItemTouchListener] 拦截时，回调，事件类型为 CANCEL
+   * - 当前手指被某个处理者绑定时回调，事件类型为 DOWN(包括 POINTER_DOWN) 或 MOVE
+   * - 被前面的 [OnItemTouchListener] 拦截时回调，事件类型为 CANCEL
    * - 被外布局拦截且当前手指无 handler 时回调，事件类型为 CANCEL，此时 [handler] = null
    *   (如果当前手指有 handler 则直接回调 [IPointerTouchHandler.onPointerTouchEvent] 了)
+   * - 子 View 调用 requestDisallowInterceptTouchEvent 直到 UP 事件时回调，事件类型为 CANCEL
    */
   protected abstract fun onPointerEventRobbed(
     event: IPointerEvent,

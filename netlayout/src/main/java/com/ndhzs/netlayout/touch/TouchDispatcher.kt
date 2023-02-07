@@ -31,6 +31,18 @@ class TouchDispatcher : ItemTouchListenerContainer {
     }
   }
   
+  fun afterDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
+    mItemTouchListener.forEachInline {
+      it.onAfterDispatchTouchEvent(event, view)
+    }
+  }
+  
+  fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean, view: ViewGroup) {
+    mItemTouchListener.forEachInline {
+      it.onRequestDisallowInterceptTouchEvent(disallowIntercept, view)
+    }
+  }
+  
   fun onInterceptTouchEvent(event: MotionEvent, view: ViewGroup): Boolean {
     val action = event.actionMasked
     if (action == MotionEvent.ACTION_DOWN) {
