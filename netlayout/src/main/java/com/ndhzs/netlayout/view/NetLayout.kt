@@ -91,12 +91,11 @@ open class NetLayout @JvmOverloads constructor(
     for (i in childCount - 1 downTo 0) {
       val child = getChildAt(i)
       if (child.visibility == GONE) continue
-      val lp = child.layoutParams.net()
-      val l = getColumnsWidth(0, lp.startColumn - 1) + paddingLeft
-      val r = l + getColumnsWidth(lp.startColumn, lp.endColumn)
-      val t = getRowsHeight(0, lp.startRow - 1) + paddingTop
-      val b = t + getRowsHeight(lp.startRow, lp.endRow)
-      if (x in l..r && y in t..b) {
+      val l = child.x
+      val r = l + child.width
+      val t = child.y
+      val b = t + child.height
+      if (x.toFloat() in l..r && y.toFloat() in t..b) {
         return child
       }
     }
