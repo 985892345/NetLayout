@@ -22,11 +22,37 @@ import com.ndhzs.netlayout.utils.forEachInline
 open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   
   open fun addPointerDispatcher(dispatcher: IPointerDispatcher) {
-    mDispatchers.add(dispatcher)
+    if (dispatcher !== mDefaultDispatcher) {
+      mDispatchers.add(dispatcher)
+    } else {
+      error("该 dispatcher 已被设置为 DefaultPointerDispatcher，不允许重复添加")
+    }
+  }
+  
+  /**
+   * 设置默认的多指触摸分发者，该分发者事件分发的优先级最低，可以用来做一些特殊操作
+   */
+  fun setDefaultPointerDispatcher(dispatcher: IPointerDispatcher?) {
+    if (dispatcher == null) {
+      mDefaultDispatcher = null
+      return
+    }
+    if (!mDispatchers.contains(dispatcher)) {
+      mDefaultDispatcher = dispatcher
+    } else {
+      error("该 dispatcher 已被添加，不允许重复添加")
+    }
+  }
+  
+  fun getDefaultPointerDispatcher(): IPointerDispatcher? {
+    return mDefaultDispatcher
   }
   
   // 全部分发者
   private val mDispatchers = ArrayList<IPointerDispatcher>(5)
+  
+  // 默认的分发者
+  private var mDefaultDispatcher: IPointerDispatcher? = null
   
   // 延迟拦截当前手指事件的分发者
   private val mDelayDispatchers = SparseArray<IPointerDispatcher>(5)
@@ -80,6 +106,7 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     mDispatchers.forEachInline {
       it.onDownEventRobbed(event, view)
     }
+    mDefaultDispatcher?.onDownEventRobbed(event, view)
   }
   
   @CallSuper
@@ -88,12 +115,25 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     mDispatchers.forEachInline {
       it.onDispatchTouchEvent(event, view)
     }
+    mDefaultDispatcher?.onDispatchTouchEvent(event, view)
+  }
+  
+  @CallSuper
+  override fun onAfterDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
+    super.onAfterDispatchTouchEvent(event, view)
+    mDispatchers.forEachInline {
+      it.onAfterDispatchTouchEvent(event, view)
+    }
+    mDefaultDispatcher?.onAfterDispatchTouchEvent(event, view)
   }
   
   /**
    * 询问所有的 dispatcher 是否拦截当前手指事件，需要拦截的话要么立即交出处理者，要么延后交出处理者
    */
-  private fun findPointerTouchHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler? {
+  private fun findPointerTouchHandler(
+    event: IPointerEvent,
+    view: ViewGroup
+  ): IPointerTouchHandler? {
     if (event.event.actionMasked == MotionEvent.ACTION_DOWN) {
       mDelayDispatchers.clear() // 防止出现问题，进行一次清理
     }
@@ -114,10 +154,9 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
               dispatcher.onOtherDispatcherRobbed(event, it)
             }
           }
+          mDefaultDispatcher?.onOtherDispatcherRobbed(event, it)
           val handler = it.getInterceptHandler(event, view)
-          return if (handler != null) {
-            handler
-          } else {
+          return if (handler != null) handler else {
             // handler 为 null 说明需要延后处理，先保存起
             mDelayDispatchers.put(event.pointerId, it)
             null
@@ -125,15 +164,22 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
         }
       }
     }
+    val default = mDefaultDispatcher
+    if (default != null) {
+      if (default.isPrepareToIntercept(event, view)) {
+        mDispatchers.forEachInline {
+          // 通知其他分发者，我抢夺了这个事件
+          it.onOtherDispatcherRobbed(event, default)
+        }
+        val handler = default.getInterceptHandler(event, view)
+        return if (handler != null) handler else {
+          // handler 为 null 说明需要延后处理，先保存起
+          mDelayDispatchers.put(event.pointerId, default)
+          null
+        }
+      }
+    }
     // 走到这里说明没有任何一个 dispatcher 想要拦截
-    return getDefaultTouchHandler(event, view)
+    return null
   }
-  
-  /**
-   * 询问是否还有其他的处理者想要处理的
-   *
-   * 如果没有任何一个 dispatcher 想要拦截，则会回调该方法，一般用于在子类中重写该方法给特殊的处理者处理
-   */
-  protected open fun getDefaultTouchHandler(event: IPointerEvent, view: ViewGroup): IPointerTouchHandler? =
-    null
 }

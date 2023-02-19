@@ -20,7 +20,7 @@ import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 interface IPointerDispatcher {
   
   /**
-   * 是否准备拦截，如果返回 true 的话，则将会把当前手指对应的事件以后都直接分发给自己
+   * 是否准备拦截，如果返回 true 的话，则将会把当前手指对应的事件以后都直接分发给该 Dispatcher
    *
    * 可以接收到 Down、Move、UP、Cancel
    *
@@ -51,11 +51,19 @@ interface IPointerDispatcher {
   
   /**
    * 在 ViewGroup 的 dispatchTouchEvent() 中调用，即事件分发下来时就回调，
-   * 每一个 [OnItemTouchListener] 都可以收到
+   * 每一个 [IPointerDispatcher] 都可以收到
    *
    * 可以接收到 Down、Move、UP、Cancel
    */
   fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
+  
+  /**
+   * 在 ViewGroup 的 dispatchTouchEvent() 调用后调用，此时处于事件向上返回的过程，
+   * 每一个 [IPointerDispatcher] 都可以收到
+   *
+   * 可以接收到 Down、Move、Up、Cancel
+   */
+  fun onAfterDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {}
   
   /**
    * 当事件被某个分发者准备拦截时回调

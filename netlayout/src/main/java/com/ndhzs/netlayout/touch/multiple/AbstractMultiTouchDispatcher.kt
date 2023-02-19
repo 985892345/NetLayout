@@ -190,7 +190,9 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
       mIsDisallowIntercept = false
     }
     mHandlerById.forEach { _, handler ->
-      handler.onDispatchTouchEvent(event, view)
+      if (handler is IPointerTouchHandler2) {
+        handler.onDispatchTouchEvent(event, view)
+      }
     }
   }
   
@@ -203,14 +205,18 @@ abstract class AbstractMultiTouchDispatcher : OnItemTouchListener {
            * 此时说明事件被子 View 处理，并且调用了 requestDisallowInterceptTouchEvent() 直到手指抬起
            * 导致 [isBeforeIntercept] 不会被回调，所以需要单独以 CANCEL 的形式调用 [onPointerEventRobbed]
            */
-          for (index in 0 until event.pointerCount) {
-            val id = event.getPointerId(index)
-            val pointerEvent = event.toPointerEvent(index, id)
-            pointerEvent.pretendEventInline(MotionEvent.ACTION_CANCEL) {
-              onPointerEventRobbed(pointerEvent, null, view)
-            }
+          val index = event.actionIndex
+          val id = event.getPointerId(index)
+          val pointerEvent = event.toPointerEvent(index, id)
+          pointerEvent.pretendEventInline(MotionEvent.ACTION_CANCEL) {
+            onPointerEventRobbed(pointerEvent, null, view)
           }
         }
+      }
+    }
+    mHandlerById.forEach { _, handler ->
+      if (handler is IPointerTouchHandler2) {
+        handler.onAfterDispatchTouchEvent(event, view)
       }
     }
   }
