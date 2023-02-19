@@ -92,11 +92,11 @@ open class NetLayout @JvmOverloads constructor(
       val child = getChildAt(i)
       if (child.visibility == GONE) continue
       val lp = child.layoutParams.net()
-      val l = getColumnsWidth(0, lp.startColumn - 1)
+      val l = getColumnsWidth(0, lp.startColumn - 1) + paddingLeft
       val r = l + getColumnsWidth(lp.startColumn, lp.endColumn)
-      val t = getRowsHeight(0, lp.startRow - 1)
+      val t = getRowsHeight(0, lp.startRow - 1) + paddingTop
       val b = t + getRowsHeight(lp.startRow, lp.endRow)
-      if (x in l .. r && y in t .. b) {
+      if (x in l..r && y in t..b) {
         return child
       }
     }
@@ -117,12 +117,12 @@ open class NetLayout @JvmOverloads constructor(
   
   override fun getColumn(x: Int): Int {
     if (width == 0) return -1
-    if (x <= 0) {
+    if (x <= paddingLeft) {
       return 0
-    } else if (x >= width) {
+    } else if (x >= width - paddingRight) {
       return columnCount - 1
     }
-    val a = x / width.toFloat()
+    val a = x / (width - paddingLeft - paddingRight).toFloat()
     var column = (a * columnCount).toInt()
     try {
       var x1 = getColumnsWidth(0, column - 1)
@@ -143,12 +143,12 @@ open class NetLayout @JvmOverloads constructor(
   
   override fun getRow(y: Int): Int {
     if (height == 0) return -1
-    if (y <= 0) {
+    if (y <= paddingTop) {
       return 0
-    } else if (y >= height) {
+    } else if (y >= height - paddingBottom) {
       return rowCount - 1
     }
-    val a = y / height.toFloat()
+    val a = y / (height - paddingTop - paddingBottom).toFloat()
     var row = (a * rowCount).toInt()
     try {
       var y1 = getRowsHeight(0, row - 1)
@@ -168,27 +168,35 @@ open class NetLayout @JvmOverloads constructor(
   }
   
   override fun getColumnsWidth(start: Int, end: Int): Int {
-    require(start in 0 .. columnCount) { "start = $start，不能大于 $columnCount 且小于 0！" }
+    require(start in 0..columnCount) { "start = $start，不能大于 $columnCount 且小于 0！" }
     require(end in -1 until columnCount) { "end = $end，不能大于或等于 $columnCount 且小于 -1！" }
     // 此时没有布局，width = 0
     if (width == 0) return 0
     if (start > end) {
       if (start - 1 == end) return 0
-      return -getColumnsWidthInternal(end + 1, start - 1, width).roundToInt()
+      return -getColumnsWidthInternal(
+        end + 1,
+        start - 1,
+        width - paddingLeft - paddingRight
+      ).roundToInt()
     }
-    return getColumnsWidthInternal(start, end, width).roundToInt()
+    return getColumnsWidthInternal(start, end, width - paddingLeft - paddingRight).roundToInt()
   }
   
   override fun getRowsHeight(start: Int, end: Int): Int {
-    require(start in 0 .. rowCount) { "start = $start，不能大于 $rowCount 且小于 0！" }
+    require(start in 0..rowCount) { "start = $start，不能大于 $rowCount 且小于 0！" }
     require(end in -1 until rowCount) { "end = $end 不能大于或等于 $rowCount 且小于 -1！" }
     // 此时没有布局，height = 0
     if (height == 0) return 0
     if (start > end) {
       if (start - 1 == end) return 0
-      return -getRowsHeightInternal(end + 1, start - 1, height).roundToInt()
+      return -getRowsHeightInternal(
+        end + 1,
+        start - 1,
+        height - paddingTop - paddingBottom
+      ).roundToInt()
     }
-    return getRowsHeightInternal(start, end, height).roundToInt()
+    return getRowsHeightInternal(start, end, height - paddingTop - paddingBottom).roundToInt()
   }
   
   override fun setColumnShowWeight(column: Int, weight: Float) {
@@ -246,34 +254,38 @@ open class NetLayout @JvmOverloads constructor(
   }
   
   override fun getColumnsShowWeight(start: Int, end: Int): Float {
-    require(start in 0 .. end && end < columnCount) {
+    require(start in 0..end && end < columnCount) {
       "start = $start，必须大于或等于 0 且小于或等于 end，end = $end，不能大于或等于 $columnCount！"
     }
     return getColumnsShowWeightInternal(start, end)
   }
   
   override fun getRowsShowWeight(start: Int, end: Int): Float {
-    require(start in 0 .. end && end < rowCount) {
+    require(start in 0..end && end < rowCount) {
       "start = $start，必须大于或等于 0 且小于或等于 end，end = $end，不能大于或等于 $rowCount！"
     }
     return getRowsShowWeightInternal(start, end)
   }
   
   override fun getColumnInitialWeight(start: Int, end: Int): Float {
-    require(start in 0 .. end && end < columnCount) {
+    require(start in 0..end && end < columnCount) {
       "start = $start，必须大于或等于 0 且小于或等于 end，end = $end，不能大于或等于 $columnCount！"
     }
     var weight = 0F
-    for (row in start .. end) { weight += mColumnInitialWeight[row] ?: 1F }
+    for (row in start..end) {
+      weight += mColumnInitialWeight[row] ?: 1F
+    }
     return weight
   }
   
   override fun getRowInitialWeight(start: Int, end: Int): Float {
-    require(start in 0 .. end && end < rowCount) {
+    require(start in 0..end && end < rowCount) {
       "start = $start，必须大于或等于 0 且小于或等于 end，end = $end，不能大于或等于 $rowCount！"
     }
     var weight = 0F
-    for (row in start .. end) { weight += mRowInitialWeight[row] ?: 1F }
+    for (row in start..end) {
+      weight += mRowInitialWeight[row] ?: 1F
+    }
     return weight
   }
   
@@ -320,8 +332,9 @@ open class NetLayout @JvmOverloads constructor(
   
   // 属性值
   @Suppress("LeakingThis")
-  protected val mNetAttrs: NetLayoutAttrs = NetLayoutAttrs.newInstance(this, attrs, defStyleAttr, defStyleRes)
-    .also { DEBUG = it.isDebug }
+  protected val mNetAttrs: NetLayoutAttrs =
+    NetLayoutAttrs.newInstance(this, attrs, defStyleAttr, defStyleRes)
+      .also { DEBUG = it.isDebug }
   
   // 参考 FrameLayout，用于在自身 wrap_content 而子 View 为 match_parent 时的测量
   private val mMatchParentChildren = ArrayList<View>()
@@ -392,30 +405,30 @@ open class NetLayout @JvmOverloads constructor(
     var maxWidth = 0
     var maxHeight = 0
     var childState = 0
-  
+    
     val parentColumnShowWeight = getSelfColumnsShowWeight()
     val parentRowShowWeight = getSelfRowsShowWeight()
-  
+    
     // 初始比例，在这个比例比 parentRowWeight 小时，可以在每行高度都不变的情况下扩大整个布局的高度，
     // 但只能用于自身测量值不为确定值时才能实现
     val columnInitialWeight = getSelfColumnInitialWeight()
     val rowInitialWeight = getSelfRowInitialWeight()
-  
+    
     for (i in 0 until childCount) {
       val child = getChildAt(i)
       if (child.visibility != GONE) {
         val lp = child.layoutParams.net()
         lp.checkRowAndColumn(rowCount, columnCount)
         if (!lp.isComplete(rowCount, columnCount)) continue
-      
+        
         // child 占的显示比重
         val childColumnShowWeight = getColumnsShowWeightInternal(lp.startColumn, lp.endColumn)
         val childRowShowWeight = getRowsShowWeightInternal(lp.startRow, lp.endRow)
-      
+        
         // 用于实际显示的比例
         val childColumnShowRatio = childColumnShowWeight / parentColumnShowWeight
         val childRowShowRatio = childRowShowWeight / parentRowShowWeight
-      
+        
         // 只用于第一次 measureChildWithRatio 中得到该显示的宽度
         val childWidthRatio =
           if (!widthIsExactly) childColumnShowWeight / columnInitialWeight
@@ -536,7 +549,9 @@ open class NetLayout @JvmOverloads constructor(
     checkColumn(start)
     checkColumn(end)
     var weight = 0F
-    for (column in start .. end) { weight += mColumnChangedWeight[column] ?: 1F }
+    for (column in start..end) {
+      weight += mColumnChangedWeight[column] ?: 1F
+    }
     return weight
   }
   
@@ -547,7 +562,9 @@ open class NetLayout @JvmOverloads constructor(
     checkRow(start)
     checkRow(end)
     var weight = 0F
-    for (row in start .. end) { weight += mRowChangedWeight[row] ?: 1F }
+    for (row in start..end) {
+      weight += mRowChangedWeight[row] ?: 1F
+    }
     return weight
   }
   
