@@ -7,11 +7,6 @@
 NetLayout 是一个类似于官方 GridLayout 的控件，但与它不同在于，NetLayout 支持重叠、长度和宽度的不统一，你可以把 NetLayout 看成一个加上了网格约束的 FrameLayout
 
 在之前接到了写掌邮新课表的需求，因为代码过老，有了重构的想法，所以写了一个网状布局，课表项目请查看掌上重邮，本项目是支撑整个课表的基础控件
-
-<img src="assets/Screenshot_2022-11-14-19-18-28-685_com.mredrock.cyxbs.jpg" alt="Screenshot_2022-11-14-19-18-28-685_com.mredrock.cyxbs" width="240" />
-
-图中就是我设计的课表控件，里面包含了8列，14行（包含了折叠的中午和傍晚），并且还有以下功能：
-
 - 支持动态折叠中午和傍晚时间段
 - 展开中午和傍晚后支持上下滑动，并且能与外层的 BottomSheetBegavior 联动
 - 课程重叠的处理
@@ -19,7 +14,8 @@ NetLayout 是一个类似于官方 GridLayout 的控件，但与它不同在于�
 - 长按空白处上下移动生成新的 item
 - 长按 item 支持移动
 
-<img src="assets/Screenrecorder-2022-11-14-19-27-37-470_ectype1.gif.gif" alt="Screenrecorder-2022-11-14-19-27-37-470_ectype1.gif"  width="240" />
+<img src="assets/Screenrecorder1.gif"  width="240" />
+<img src="assets/Screenrecorder2.gif"  width="240" />
 
 ## 添加依赖
 
