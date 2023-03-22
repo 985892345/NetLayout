@@ -5,210 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.ndhzs.netlayout.demo.NetScrollView
+    <com.ndhzs.netlayout.view.NetLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:net_rowCount="20"
+        app:net_columnCount="10"
+        app:net_isDebug="true">
 
-        <com.ndhzs.netlayout.view.NetLayout2
-            android:id="@+id/netLayout"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:net_rowCount="14"
-            app:net_columnCount="8"
-            app:net_isDebug="true">
-            
-            <com.ndhzs.netlayout.demo.NetView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:net_layout_endRow="0"
-                app:net_layout_startRow="0"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0" />
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_orange_light"
+            app:net_layout_startRow="2"
+            app:net_layout_startColumn="4"
+            app:net_layout_endRow="6"
+            app:net_layout_endColumn="8" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="1"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="0"
-                app:net_layout_endRow="0"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_dark"
+            app:net_layout_startRow="5"
+            app:net_layout_startColumn="2"
+            app:net_layout_endRow="9"
+            app:net_layout_endColumn="5" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="2"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="1"
-                app:net_layout_endRow="1"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_red_dark"
+            app:net_layout_startRow="6"
+            app:net_layout_startColumn="4"
+            app:net_layout_endRow="14"
+            app:net_layout_endColumn="7" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="3"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="2"
-                app:net_layout_endRow="2"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="4"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="3"
-                app:net_layout_endRow="3"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="5"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="5"
-                app:net_layout_endRow="5"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="中\n午"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="4"
-                app:net_layout_endRow="4"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="6"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="6"
-                app:net_layout_endRow="6"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="7"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="7"
-                app:net_layout_endRow="7"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="8"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="8"
-                app:net_layout_endRow="8"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="傍\n晚"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="9"
-                app:net_layout_endRow="9"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="9"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="10"
-                app:net_layout_endRow="10"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="10"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="11"
-                app:net_layout_endRow="11"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="11"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="12"
-                app:net_layout_endRow="12"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="12"
-                android:textSize="20sp"
-                android:textColor="@color/black"
-                android:gravity="center"
-                app:net_layout_startRow="13"
-                app:net_layout_endRow="13"
-                app:net_layout_startColumn="0"
-                app:net_layout_endColumn="0"
-                tools:ignore="HardcodedText" />
-
-        </com.ndhzs.netlayout.view.NetLayout2>
-
-    </com.ndhzs.netlayout.demo.NetScrollView>
+    </com.ndhzs.netlayout.view.NetLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

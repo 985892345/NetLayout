@@ -4,7 +4,9 @@
 
  一个功能更全面的网状布局
 
-NetLayout 是一个类似于官方 GridLayout 的控件，但与它不同在于，NetLayout 支持重叠、长度和宽度的不统一，你可以把 NetLayout 看成一个加上了网格约束的 FrameLayout
+NetLayout 是一个类似于官方 GridLayout 的控件，但与它不同在于，NetLayout 支持重叠、长度和宽度的不统一，并且还允许重叠，你可以把 NetLayout 看成一个加上了网格约束的 FrameLayout
+
+<img src="assets/NetLayout.png"  width="480" />
 
 在之前接到了写掌邮新课表的需求，因为代码过老，有了重构的想法，所以写了一个网状布局，课表项目请查看掌上重邮，本项目是支撑整个课表的基础控件
 - 支持动态折叠中午和傍晚时间段
