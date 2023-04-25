@@ -101,7 +101,7 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
       _endRow = R.styleable.NetLayout_Layout_net_layout_endRow.int(UNSET)
       _startColumn = R.styleable.NetLayout_Layout_net_layout_startColumn.int(UNSET)
       _endColumn = R.styleable.NetLayout_Layout_net_layout_endColumn.int(UNSET)
-      gravity = R.styleable.NetLayout_Layout_net_layout_gravity.int(Gravity.CENTER)
+      gravity = R.styleable.NetLayout_Layout_net_layout_gravity.int(Gravity.TOP)
     }
     initRowColumn()
   }
@@ -113,7 +113,7 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     endColumn: Int,
     width: Int = MATCH_PARENT,
     height: Int = MATCH_PARENT,
-    gravity: Int = Gravity.CENTER,
+    gravity: Int = Gravity.TOP,
   ) : super(width, height) {
     this._startRow = startRow
     this._endRow = endRow
@@ -127,7 +127,7 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     bean: INetBean,
     width: Int = MATCH_PARENT,
     height: Int = MATCH_PARENT,
-    gravity: Int = Gravity.CENTER,
+    gravity: Int = Gravity.TOP,
   ) : this(bean.startRow, bean.endRow, bean.startColumn, bean.endColumn, width, height, gravity)
   
   constructor(source: NetLayoutParams) : super(source) {
@@ -144,7 +144,7 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     this._endRow = UNSET
     this._startColumn = UNSET
     this._endColumn = UNSET
-    this.gravity = UNSET
+    this.gravity = Gravity.TOP
     initRowColumn()
   }
   
@@ -153,7 +153,7 @@ open class NetLayoutParams : ViewGroup.MarginLayoutParams, INetBean, Comparable<
     this._endRow = UNSET
     this._startColumn = UNSET
     this._endColumn = UNSET
-    this.gravity = UNSET
+    this.gravity = Gravity.TOP
     initRowColumn()
   }
   
