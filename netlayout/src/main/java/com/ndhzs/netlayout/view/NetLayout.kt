@@ -122,22 +122,19 @@ open class NetLayout @JvmOverloads constructor(
       return columnCount - 1
     }
     val a = x / (width - paddingLeft - paddingRight).toFloat()
-    var column = (a * columnCount).toInt()
+    var column = (a * columnCount).toInt() // 先估算出一个大致的值
     try {
-      var x1 = getColumnsWidth(0, column - 1)
-      var x2 = x1 + getColumnsWidth(column, column)
-      while (x < x1) {
-        column--
-        x1 -= getColumnsWidth(column, column)
-      }
-      while (x > x2) {
-        column++
-        x2 += getColumnsWidth(column, column)
+      if (x > getColumnsWidth(0, column) + paddingLeft) {
+        // 不使用 getColumnsWidth(column, column + 1) 而使用 getColumnsWidth(0, column + 1) 以防止精度问题
+        while (x > getColumnsWidth(0, column + 1) + paddingLeft) column++
+        return column + 1
+      } else {
+        while (x <= getColumnsWidth(0, column - 1) + paddingLeft) column--
+        return column
       }
     } catch (e: RuntimeException) {
       throw IllegalArgumentException("此时 x = $x 值得到的 column = $column 有问题，问题如下：${e.message}")
     }
-    return column
   }
   
   override fun getRow(y: Int): Int {
@@ -148,22 +145,19 @@ open class NetLayout @JvmOverloads constructor(
       return rowCount - 1
     }
     val a = y / (height - paddingTop - paddingBottom).toFloat()
-    var row = (a * rowCount).toInt()
+    var row = (a * rowCount).toInt() // 先估算出一个大致的值
     try {
-      var y1 = getRowsHeight(0, row - 1)
-      var y2 = y1 + getRowsHeight(row, row)
-      while (y < y1) {
-        row--
-        y1 -= getRowsHeight(row, row)
-      }
-      while (y > y2) {
-        row++
-        y2 += getRowsHeight(row, row)
+      if (y > getRowsHeight(0, row) + paddingTop) {
+        // 不使用 getRowsHeight(row, row + 1) 而使用 getRowsHeight(0, row + 1) 以防止精度问题
+        while (y > getRowsHeight(0, row + 1) + paddingTop) row++
+        return row + 1
+      } else {
+        while (y <= getRowsHeight(0, row - 1) + paddingTop) row--
+        return row
       }
     } catch (e: RuntimeException) {
       throw IllegalArgumentException("此时 y = $y 值得到的 row = $row 有问题，问题如下：${e.message}")
     }
-    return row
   }
   
   override fun getColumnsWidth(start: Int, end: Int): Int {
@@ -369,14 +363,13 @@ open class NetLayout @JvmOverloads constructor(
     var start = 0
     var end = childCount - 1
     while (start <= end) {
-      val half = (start + end) / 2
+      val half = (start + end) ushr 1 // 算术移位，防止溢出
       val view = getChildAt(half)
       val lp = view.layoutParams.net()
-      // 折半插入，自己画图就能看懂
-      if (compareLayoutParams(params, lp) < 0) {
-        end = half - 1
-      } else {
+      if (compareLayoutParams(params, lp) >= 0) {
         start = half + 1
+      } else {
+        end = half - 1
       }
     }
     return start
@@ -655,15 +648,13 @@ open class NetLayout @JvmOverloads constructor(
         if (!lp.isComplete(rowCount, columnCount)) continue
         
         // 使用 roundToInt() 解决改变比重时的轻微抖动问题
-        val ll = paddingLeft +
-          getColumnsWidthInternal(0, lp.startColumn - 1, totalColumnWidth)
-        val rr = ll + getColumnsWidthInternal(lp.startColumn, lp.endColumn, totalColumnWidth)
+        val ll = paddingLeft + getColumnsWidthInternal(0, lp.startColumn - 1, totalColumnWidth)
+        val rr = paddingLeft + getColumnsWidthInternal(0, lp.endColumn, totalColumnWidth)
         val parentLeft = ll.roundToInt()
         val parentRight = rr.roundToInt()
         
-        val tt = paddingTop +
-          getRowsHeightInternal(0, lp.startRow - 1, totalRowHeight)
-        val bb = tt + getRowsHeightInternal(lp.startRow, lp.endRow, totalRowHeight)
+        val tt = paddingTop + getRowsHeightInternal(0, lp.startRow - 1, totalRowHeight)
+        val bb = paddingTop + getRowsHeightInternal(0, lp.endRow, totalRowHeight)
         val parentTop = tt.roundToInt()
         val parentBottom = bb.roundToInt()
         
