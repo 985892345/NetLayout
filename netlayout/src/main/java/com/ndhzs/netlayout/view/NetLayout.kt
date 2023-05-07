@@ -4,12 +4,17 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Build
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.forEach
+import androidx.core.util.putAll
+import androidx.customview.view.AbsSavedState
 import com.ndhzs.netlayout.INetLayout
 import com.ndhzs.netlayout.R
 import com.ndhzs.netlayout.callback.OnWeightChangeListener
@@ -333,16 +338,16 @@ open class NetLayout @JvmOverloads constructor(
   private val mMatchParentChildren = ArrayList<View>()
   
   // 记录行比重不为 1F 的行数和比重数
-  private val mRowChangedWeight = SparseArray<Float>()
+  private val mRowChangedWeight = SparseArray<Float>(mNetAttrs.rowCount)
   
   // 记录列比重不为 1F 的列数和比重数
-  private val mColumnChangedWeight = SparseArray<Float>()
+  private val mColumnChangedWeight = SparseArray<Float>(mNetAttrs.columnCount)
   
   // 记录初始化行比重不为 1F 的行数和比重数
-  private val mRowInitialWeight = SparseArray<Float>()
+  private val mRowInitialWeight = SparseArray<Float>(mNetAttrs.rowCount)
   
   // 记录初始化列比重不为 1F 的列数和比重数
-  private val mColumnInitialWeight = SparseArray<Float>()
+  private val mColumnInitialWeight = SparseArray<Float>(mNetAttrs.columnCount)
   
   // 比重改变监听
   private val mOnWeightChangeListeners = ArrayList<OnWeightChangeListener>(2)
@@ -678,9 +683,11 @@ open class NetLayout @JvmOverloads constructor(
             parentLeft + (parentRight - parentLeft - width) / 2 +
               lp.leftMargin - lp.rightMargin
           }
+          
           Gravity.RIGHT -> {
             parentLeft + lp.leftMargin
           }
+          
           Gravity.LEFT -> parentLeft + lp.leftMargin
           else -> parentLeft + lp.leftMargin
         }
@@ -689,6 +696,7 @@ open class NetLayout @JvmOverloads constructor(
             parentTop + (parentBottom - parentTop - height) / 2 +
               lp.topMargin - lp.bottomMargin
           }
+          
           Gravity.TOP -> parentTop + lp.topMargin
           Gravity.BOTTOM -> parentBottom - height - lp.bottomMargin
           else -> parentTop + lp.topMargin
@@ -782,6 +790,85 @@ open class NetLayout @JvmOverloads constructor(
   }
   
   protected fun LayoutParams.net(): NetLayoutParams = this as NetLayoutParams
+  
+  override fun onSaveInstanceState(): Parcelable? {
+    val savedState = SavedState(super.onSaveInstanceState()!!)
+    savedState.rowChangedWeight = mRowChangedWeight.clone()
+    savedState.columnChangedWeight = mColumnChangedWeight.clone()
+    savedState.rowInitialWeight = mRowInitialWeight.clone()
+    savedState.columnInitialWeight = mColumnInitialWeight.clone()
+    return savedState
+  }
+  
+  override fun onRestoreInstanceState(state: Parcelable?) {
+    if (state !is SavedState) {
+      super.onRestoreInstanceState(state)
+      return
+    }
+    super.onRestoreInstanceState(state.superState)
+    // 可能在 onRestoreInstanceState 前改变了比重，所以需要先把旧的改为新的，再全部放进新的中
+    state.rowChangedWeight.putAll(mRowChangedWeight)
+    mRowChangedWeight.putAll(state.rowChangedWeight)
+    state.columnChangedWeight.putAll(mColumnChangedWeight)
+    mColumnChangedWeight.putAll(state.columnChangedWeight)
+    state.rowInitialWeight.putAll(mRowInitialWeight)
+    mRowInitialWeight.putAll(state.rowInitialWeight)
+    state.columnInitialWeight.putAll(mColumnInitialWeight)
+    mColumnInitialWeight.putAll(state.columnInitialWeight)
+    requestLayout()
+  }
+  
+  class SavedState : AbsSavedState {
+    
+    lateinit var rowChangedWeight: SparseArray<Float>
+    lateinit var columnChangedWeight: SparseArray<Float>
+    lateinit var rowInitialWeight: SparseArray<Float>
+    lateinit var columnInitialWeight: SparseArray<Float>
+    
+    // 由 onSaveInstanceState 调用
+    constructor(superState: Parcelable) : super(superState)
+    
+    // 由 CREATOR 调用
+    constructor(source: Parcel, loader: ClassLoader?) : super(source, loader) {
+      rowChangedWeight = readSparseArray(source, loader)
+      columnChangedWeight = readSparseArray(source, loader)
+      rowInitialWeight = readSparseArray(source, loader)
+      columnInitialWeight = readSparseArray(source, loader)
+    }
+    
+    private inline fun <reified T> readSparseArray(
+      source: Parcel,
+      loader: ClassLoader?
+    ): SparseArray<T> {
+      return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        source.readSparseArray(loader, T::class.java)!!
+      } else {
+        source.readSparseArray(loader)!!
+      }
+    }
+    
+    override fun writeToParcel(out: Parcel, flags: Int) {
+      super.writeToParcel(out, flags)
+      out.writeSparseArray(rowChangedWeight)
+      out.writeSparseArray(columnChangedWeight)
+      out.writeSparseArray(rowInitialWeight)
+      out.writeSparseArray(columnInitialWeight)
+    }
+    
+    companion object CREATOR : Parcelable.ClassLoaderCreator<SavedState> {
+      override fun createFromParcel(source: Parcel, loader: ClassLoader?): SavedState {
+        return SavedState(source, loader)
+      }
+      
+      override fun createFromParcel(source: Parcel): SavedState {
+        return createFromParcel(source, null)
+      }
+      
+      override fun newArray(size: Int): Array<SavedState?> {
+        return arrayOfNulls(size)
+      }
+    }
+  }
   
   companion object {
     private val DEBUG_LINE_PAINT by lazy {

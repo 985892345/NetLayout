@@ -4,22 +4,25 @@ import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.os.Build
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.collection.ArrayMap
+import androidx.customview.view.AbsSavedState
 import com.ndhzs.netlayout.R
-import com.ndhzs.netlayout.child.OnChildExistListener
 import com.ndhzs.netlayout.child.ChildExistListenerContainer
+import com.ndhzs.netlayout.child.OnChildExistListener
 import com.ndhzs.netlayout.draw.ItemDecoration
-import com.ndhzs.netlayout.touch.OnItemTouchListener
-import com.ndhzs.netlayout.touch.TouchDispatcher
-import com.ndhzs.netlayout.save.OnSaveStateListener
 import com.ndhzs.netlayout.draw.ItemDecorationContainer
+import com.ndhzs.netlayout.save.OnSaveStateListener
 import com.ndhzs.netlayout.save.SaveStateListenerContainer
 import com.ndhzs.netlayout.touch.ItemTouchListenerContainer
+import com.ndhzs.netlayout.touch.OnItemTouchListener
+import com.ndhzs.netlayout.touch.TouchDispatcher
 import com.ndhzs.netlayout.transition.ChildVisibleListenerContainer
 import com.ndhzs.netlayout.transition.LayoutTransitionHelper
 import com.ndhzs.netlayout.transition.OnChildVisibleListener
@@ -71,6 +74,12 @@ open class NetLayout2 @JvmOverloads constructor(
   }
   
   final override fun addSaveStateListener(tag: String, listener: OnSaveStateListener) {
+    val oldListener = mSaveBundleListeners[tag]
+    if (oldListener != null) {
+      check(oldListener !== listener) {
+        "tag = $tag 已被重复添加，oldListener = $oldListener   listener = $listener"
+      }
+    }
     val bundle = mSaveBundleListenerCache[tag]
     if (bundle != null) {
       // 如果有之前保留的数据，意思是设置监听前就得到了保留的数据
@@ -134,30 +143,32 @@ open class NetLayout2 @JvmOverloads constructor(
   // 如果没有设置监听，就暂时保存
   private val mSaveBundleListenerCache = ArrayMap<String, Parcelable?>(3)
   
-  final override fun onRestoreInstanceState(state: Parcelable) {
-    if (state !is NetSavedState) {
-      super.onRestoreInstanceState(state)
-      return
-    }
+  final override fun onRestoreInstanceState(state: Parcelable?) {
+    check(state is NetSavedState) { "state 必须为 NetSavedState 类型!" }
     super.onRestoreInstanceState(state.superState)
     mSaveBundleListenerCache.clear()
     // 再恢复 mSaveBundleListeners 的状态
-    state.saveBundleListeners.forEachInline { k, v ->
-      val listener = mSaveBundleListeners[k]
-      if (listener != null) {
-        listener.onRestoreState(v)
+    val keySet = state.saveBundle.keySet()
+    keySet.forEach {
+      val parcelable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        state.saveBundle.getParcelable(it, Parcelable::class.java)
       } else {
-        mSaveBundleListenerCache[k] = v
+        state.saveBundle.getParcelable(it)
+      }
+      val listener = mSaveBundleListeners[it]
+      if (listener != null) {
+        listener.onRestoreState(parcelable)
+      } else {
+        mSaveBundleListenerCache[it] = parcelable
       }
     }
   }
   
   final override fun onSaveInstanceState(): Parcelable {
-    val superState = super.onSaveInstanceState()
-    val ss = NetSavedState(superState)
+    val ss = NetSavedState(super.onSaveInstanceState()!!)
     // 保存 mSaveBundleListeners 的状态
     mSaveBundleListeners.forEachInline { k, v ->
-      ss.saveBundleListeners[k] = v.onSaveState()
+      ss.saveBundle.putParcelable(k, v.onSaveState())
     }
     return ss
   }
@@ -165,25 +176,30 @@ open class NetLayout2 @JvmOverloads constructor(
   /**
    * 用于在布局被摧毁时保存必要的信息
    */
-  open class NetSavedState : BaseSavedState {
+  class NetSavedState : AbsSavedState {
     // 保存的 mSaveBundleListeners 的信息
-    val saveBundleListeners: ArrayMap<String, Parcelable?> = ArrayMap()
-    
-    constructor(superState: Parcelable?) : super(superState)
-    
-    @SuppressLint("ParcelClassLoader")
-    constructor(source: Parcel) : super(source) {
-      source.readMap(saveBundleListeners, null)
+    val saveBundle = Bundle()
+  
+    // 由 onSaveInstanceState 调用
+    constructor(superState: Parcelable) : super(superState)
+  
+    // 由 CREATOR 调用
+    constructor(source: Parcel, loader: ClassLoader?) : super(source, loader) {
+      source.readBundle(loader)
     }
     
     override fun writeToParcel(out: Parcel, flags: Int) {
       super.writeToParcel(out, flags)
-      out.writeMap(saveBundleListeners)
+      out.writeBundle(saveBundle)
     }
     
-    companion object CREATOR : Parcelable.Creator<NetSavedState> {
+    companion object CREATOR : Parcelable.ClassLoaderCreator<NetSavedState> {
+      override fun createFromParcel(source: Parcel, loader: ClassLoader?): NetSavedState {
+        return NetSavedState(source, loader)
+      }
+  
       override fun createFromParcel(source: Parcel): NetSavedState {
-        return NetSavedState(source)
+        return createFromParcel(source, null)
       }
       
       override fun newArray(size: Int): Array<NetSavedState?> {
@@ -219,11 +235,15 @@ open class NetLayout2 @JvmOverloads constructor(
     super.setLayoutTransition(this)
   }
   
-  @Deprecated("不支持自定义 LayoutTransition", ReplaceWith("请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置"), DeprecationLevel.HIDDEN)
+  @Deprecated(
+    "不支持自定义 LayoutTransition",
+    ReplaceWith("请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置"),
+    DeprecationLevel.HIDDEN
+  )
   final override fun setLayoutTransition(transition: LayoutTransition?) {
     // 官方没有提供可用的父布局监听子布局 Visibility 的回调
     // 为了实现 OnChildVisibleListener，采取了 LayoutTransition 来监听
-    throw IllegalArgumentException("${this::class.simpleName} 不支持 setLayoutTransition()，请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置")
+    throw IllegalArgumentException("不支持 setLayoutTransition()，请使用 getLayoutTransition() 得到已经设置好的 LayoutTransition 进行设置")
   }
   
   final override fun getLayoutTransition(): LayoutTransition {

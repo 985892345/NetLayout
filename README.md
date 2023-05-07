@@ -10,17 +10,6 @@ NetLayout 是一个类似于官方 GridLayout 的控件，但与它不同在于�
 
 <img src="assets/NetLayout.png"  width="480" />
 
-在之前接到了写掌邮新课表的需求，因为代码过老，有了重构的想法，所以写了一个网状布局，课表项目请查看掌上重邮，本项目是支撑整个课表的基础控件
-- 支持动态折叠中午和傍晚时间段
-- 展开中午和傍晚后支持上下滑动，并且能与外层的 BottomSheetBehavior 联动
-- 课程重叠的处理
-- 支持多指触摸
-- 长按空白处上下移动生成新的 item
-- 长按 item 支持移动
-
-<img src="assets/Screenrecorder1.gif"  width="240" />
-<img src="assets/Screenrecorder2.gif"  width="240" />
-
 ## 添加依赖
 
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.985892345/NetLayout)
@@ -366,4 +355,17 @@ dispatcher.addPointerTouchHandler(pointerTouchHandler3)
 
 
 其他几个监听比较简单，就不再讲解
+
+## 掌邮课表
+
+在之前接到了写掌邮新课表的需求，因为代码过老，有了重构的想法，所以写了一个网状布局，课表项目请查看掌上重邮，本项目是支撑整个课表的基础控件
+- 支持动态折叠中午和傍晚时间段
+- 展开中午和傍晚后支持上下滑动，并且能与外层的 BottomSheetBehavior 联动
+- 课程重叠的处理
+- 支持多指触摸
+- 长按空白处上下移动生成新的 item
+- 长按 item 支持移动
+
+<img src="assets/Screenrecorder1.gif"  width="240" />
+<img src="assets/Screenrecorder2.gif"  width="240" />
 
