@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "NetLayout"
 include(":app")
 include(":netlayout")
+include(":netlayout-compose")
