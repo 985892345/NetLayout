@@ -26,6 +26,7 @@ import com.ndhzs.netlayout.attrs.SideType
 import com.ndhzs.netlayout.utils.forEachReversed
 import kotlin.collections.ArrayList
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -338,16 +339,16 @@ open class NetLayout @JvmOverloads constructor(
   private val mMatchParentChildren = ArrayList<View>()
   
   // 记录行比重不为 1F 的行数和比重数
-  private val mRowChangedWeight = SparseArray<Float>(mNetAttrs.rowCount)
+  private val mRowChangedWeight = SparseArray<Float>(min(mNetAttrs.rowCount, 5))
   
   // 记录列比重不为 1F 的列数和比重数
-  private val mColumnChangedWeight = SparseArray<Float>(mNetAttrs.columnCount)
+  private val mColumnChangedWeight = SparseArray<Float>(min(mNetAttrs.columnCount, 5))
   
   // 记录初始化行比重不为 1F 的行数和比重数
-  private val mRowInitialWeight = SparseArray<Float>(mNetAttrs.rowCount)
+  private val mRowInitialWeight = SparseArray<Float>(min(mNetAttrs.rowCount, 5))
   
   // 记录初始化列比重不为 1F 的列数和比重数
-  private val mColumnInitialWeight = SparseArray<Float>(mNetAttrs.columnCount)
+  private val mColumnInitialWeight = SparseArray<Float>(min(mNetAttrs.columnCount, 5))
   
   // 比重改变监听
   private val mOnWeightChangeListeners = ArrayList<OnWeightChangeListener>(2)
@@ -708,12 +709,18 @@ open class NetLayout @JvmOverloads constructor(
   
   private fun getColumnsWidthInternal(start: Int, end: Int, totalColumnWidth: Int): Float {
     if (end < start) return 0F
-    return getColumnsShowWeightInternal(start, end) / getSelfColumnsShowWeight() * totalColumnWidth
+    if (totalColumnWidth == 0) return 0F
+    val selfColumnsShowWeight = getSelfColumnsShowWeight()
+    if (selfColumnsShowWeight == 0F) return 0F
+    return getColumnsShowWeightInternal(start, end) / selfColumnsShowWeight * totalColumnWidth
   }
   
   private fun getRowsHeightInternal(start: Int, end: Int, totalRowHeight: Int): Float {
     if (end < start) return 0F
-    return getRowsShowWeightInternal(start, end) / getSelfRowsShowWeight() * totalRowHeight
+    if (totalRowHeight == 0) return 0F
+    val selfRowsShowWeight = getSelfRowsShowWeight()
+    if (selfRowsShowWeight == 0F) return 0F
+    return getRowsShowWeightInternal(start, end) / selfRowsShowWeight * totalRowHeight
   }
   
   override fun dispatchDraw(canvas: Canvas) {
