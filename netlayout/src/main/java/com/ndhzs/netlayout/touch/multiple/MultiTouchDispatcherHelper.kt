@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent
 import com.ndhzs.netlayout.touch.multiple.event.IPointerEvent.Action.*
+import com.ndhzs.netlayout.touch.multiple.event.toPointerEvent
 import com.ndhzs.netlayout.utils.forEachInline
+import com.ndhzs.netlayout.utils.forEachReversed
 
 /**
  * ## 处理多指触摸的帮助类
@@ -27,6 +29,17 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
     } else {
       error("该 dispatcher 已被设置为 DefaultPointerDispatcher，不允许重复添加")
     }
+  }
+
+  /**
+   * 只会在 dispatchTouchEvent 中分发事件的 [IPointerTouchHandler]，会回调所有手指的事件
+   */
+  open fun addDispatchPointerTouchHandler(handler: IPointerTouchHandler) {
+    mDispatchPointerTouchHandlers.add(handler)
+  }
+
+  open fun removeDispatchPointerTouchHandler(handler: IPointerTouchHandler) {
+    mDispatchPointerTouchHandlers.remove(handler)
   }
   
   /**
@@ -56,6 +69,9 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   
   // 延迟拦截当前手指事件的分发者
   private val mDelayDispatchers = SparseArray<IPointerDispatcher>(5)
+
+  // 只在 dispatchTouchEvent 中分发事件的 handler
+  private val mDispatchPointerTouchHandlers = ArrayList<IPointerTouchHandler>(2)
   
   @CallSuper
   override fun getInterceptHandler(
@@ -112,6 +128,24 @@ open class MultiTouchDispatcherHelper : AbstractMultiTouchDispatcher() {
   @CallSuper
   override fun onDispatchTouchEvent(event: MotionEvent, view: ViewGroup) {
     super.onDispatchTouchEvent(event, view)
+    if (mDispatchPointerTouchHandlers.isNotEmpty()) {
+      when (event.actionMasked) {
+        MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN,
+        MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
+          val index = event.actionIndex
+          val id = event.getPointerId(index)
+          val pointerEvent = event.toPointerEvent(index, id)
+          mDispatchPointerTouchHandlers.forEachReversed { it.onPointerTouchEvent(pointerEvent, view) }
+        }
+        MotionEvent.ACTION_MOVE, MotionEvent.ACTION_CANCEL -> {
+          for (index in 0 until event.pointerCount) {
+            val id = event.getPointerId(index)
+            val pointerEvent = event.toPointerEvent(index, id)
+            mDispatchPointerTouchHandlers.forEachReversed { it.onPointerTouchEvent(pointerEvent, view) }
+          }
+        }
+      }
+    }
     mDispatchers.forEachInline {
       it.onDispatchTouchEvent(event, view)
     }

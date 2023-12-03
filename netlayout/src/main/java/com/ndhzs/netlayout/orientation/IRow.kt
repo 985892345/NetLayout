@@ -1,5 +1,7 @@
 package com.ndhzs.netlayout.orientation
 
+import com.ndhzs.netlayout.callback.OnRowWeightChangeListener
+
 /**
  * ...
  *
@@ -95,4 +97,14 @@ interface IRow {
    * @return 不符合要求返回 false
    */
   fun syncRowWeight(layout: IRow): Boolean
+
+  /**
+   * 设置行比重被修改的监听
+   */
+  fun addOnRowWeightChangeListener(l: OnRowWeightChangeListener)
+
+  /**
+   * 删除监听
+   */
+  fun removeOnRowWeightChangeListener(l: OnRowWeightChangeListener)
 }

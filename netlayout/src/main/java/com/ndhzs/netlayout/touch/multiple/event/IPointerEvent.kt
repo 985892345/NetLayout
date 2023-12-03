@@ -41,10 +41,11 @@ interface IPointerEvent {
  *    }
  * ```
  */
-fun IPointerEvent.pretendEvent(action: Int, func: (IPointerEvent) -> Unit) {
+inline fun IPointerEvent.pretendEvent(action: Int, func: (IPointerEvent) -> Unit) {
   pretendEventInline(action, func)
 }
 
+@PublishedApi
 internal inline fun IPointerEvent.pretendEventInline(newAction: Int, func: (IPointerEvent) -> Unit) {
   val oldAction = event.action
   PointerEventImpl.event.action = newAction

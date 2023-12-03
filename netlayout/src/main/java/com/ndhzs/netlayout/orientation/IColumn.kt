@@ -1,5 +1,7 @@
 package com.ndhzs.netlayout.orientation
 
+import com.ndhzs.netlayout.callback.OnColumnWeightChangeListener
+
 /**
  * ...
  *
@@ -94,4 +96,14 @@ interface IColumn {
    * @return 不符合要求返回 false
    */
   fun syncColumnWeight(layout: IColumn): Boolean
+
+  /**
+   * 设置列比重被修改的监听
+   */
+  fun addOnColumnWeightChangeListener(l: OnColumnWeightChangeListener)
+
+  /**
+   * 删除监听
+   */
+  fun removeOnColumnWeightChangeListener(l: OnColumnWeightChangeListener)
 }

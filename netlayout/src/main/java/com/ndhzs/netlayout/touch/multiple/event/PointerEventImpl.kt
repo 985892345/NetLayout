@@ -17,6 +17,7 @@ import com.ndhzs.netlayout.touch.multiple.AbstractMultiTouchDispatcher
  * @email 2767465918@qq.com
  * @date 2022/2/16 16:29
  */
+@PublishedApi
 internal object PointerEventImpl : IPointerEvent {
   override lateinit var event: MotionEvent
   override var pointerIndex: Int = -1
@@ -44,7 +45,7 @@ internal object PointerEventImpl : IPointerEvent {
 /**
  * 将 MotionEvent 转化为 IPointerEvent，**内部使用方法，不建议私自调用**
  */
-internal fun MotionEvent.toPointerEvent(
+fun MotionEvent.toPointerEvent(
   pointerIndex: Int,
   pointerId: Int
 ): IPointerEvent = PointerEventImpl.also {

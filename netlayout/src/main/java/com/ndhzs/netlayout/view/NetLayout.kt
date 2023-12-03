@@ -23,6 +23,8 @@ import com.ndhzs.netlayout.attrs.NetLayoutParams
 import com.ndhzs.netlayout.orientation.IColumn
 import com.ndhzs.netlayout.orientation.IRow
 import com.ndhzs.netlayout.attrs.SideType
+import com.ndhzs.netlayout.callback.OnColumnWeightChangeListener
+import com.ndhzs.netlayout.callback.OnRowWeightChangeListener
 import com.ndhzs.netlayout.utils.forEachReversed
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -210,6 +212,9 @@ open class NetLayout @JvmOverloads constructor(
     mOnWeightChangeListeners.forEachReversed {
       it.onChange(old, weight, column, SideType.COLUMN)
     }
+    mOnColumnWeightChangeListener.forEachReversed {
+      it.onColumnChange(old, weight, column)
+    }
     requestLayout()
   }
   
@@ -224,6 +229,9 @@ open class NetLayout @JvmOverloads constructor(
     }
     mOnWeightChangeListeners.forEachReversed {
       it.onChange(old, weight, row, SideType.ROW)
+    }
+    mOnRowWeightChangeListener.forEachReversed {
+      it.onRowChange(old, weight, row)
     }
     requestLayout()
   }
@@ -296,13 +304,30 @@ open class NetLayout @JvmOverloads constructor(
     mNetAttrs.rowCount = row
     requestLayout()
   }
-  
+
+  @Deprecated("使用 addOnRowWeightChangeListener addOnColumnWeightChangeListener")
   override fun addOnWeightChangeListener(l: OnWeightChangeListener) {
     mOnWeightChangeListeners.add(l)
   }
-  
+
   override fun removeOnWeightChangeListener(l: OnWeightChangeListener) {
     mOnWeightChangeListeners.remove(l)
+  }
+
+  override fun addOnRowWeightChangeListener(l: OnRowWeightChangeListener) {
+    mOnRowWeightChangeListener.add(l)
+  }
+
+  override fun removeOnRowWeightChangeListener(l: OnRowWeightChangeListener) {
+    mOnRowWeightChangeListener.remove(l)
+  }
+
+  override fun addOnColumnWeightChangeListener(l: OnColumnWeightChangeListener) {
+    mOnColumnWeightChangeListener.add(l)
+  }
+
+  override fun removeOnColumnWeightChangeListener(l: OnColumnWeightChangeListener) {
+    mOnColumnWeightChangeListener.remove(l)
   }
   
   override fun syncColumnWeight(layout: IColumn): Boolean {
@@ -352,7 +377,9 @@ open class NetLayout @JvmOverloads constructor(
   
   // 比重改变监听
   private val mOnWeightChangeListeners = ArrayList<OnWeightChangeListener>(2)
-  
+  private val mOnRowWeightChangeListener = ArrayList<OnRowWeightChangeListener>(2)
+  private val mOnColumnWeightChangeListener = ArrayList<OnColumnWeightChangeListener>(2)
+
   /**
    * 控制 View 被添加进来时的顺序，如果有重复的相同值，则是最后一位相同值的索引加 1
    * ```

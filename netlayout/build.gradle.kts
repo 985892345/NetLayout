@@ -7,7 +7,7 @@ plugins {
 
 android {
   namespace = "com.ndhzs.netlayout"
-  compileSdk = 33
+  compileSdk = 34
   
   defaultConfig {
     minSdk = 21
@@ -37,7 +37,7 @@ dependencies {
 }
 
 group = "io.github.985892345"
-version = "1.1.1-SNAPSHOT"
+version = "1.1.2-SNAPSHOT"
 val projectArtifact = "NetLayout"
 val projectGithubName = projectArtifact
 val projectDescription = "一个功能更全面的网状布局"

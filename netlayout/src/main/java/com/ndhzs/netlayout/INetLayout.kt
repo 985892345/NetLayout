@@ -42,12 +42,13 @@ interface INetLayout : IRow, IColumn {
    * 设置行数和列数
    */
   fun setRowColumnCount(row: Int, column: Int)
-  
+
   /**
    * 设置行或列比重被修改的监听
    */
+  @Deprecated("使用 addOnRowWeightChangeListener addOnColumnWeightChangeListener")
   fun addOnWeightChangeListener(l: OnWeightChangeListener)
-  
+
   /**
    * 删除监听
    */
