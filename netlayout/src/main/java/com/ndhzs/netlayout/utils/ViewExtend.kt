@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
  * @email 2767465918@qq.com
  * @date 2022/2/12 15:51
  */
-internal interface ViewExtend {
+interface ViewExtend {
   
   fun getContext(): Context
   

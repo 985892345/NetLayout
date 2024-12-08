@@ -1,6 +1,7 @@
 # NetLayout
 
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.985892345/NetLayout)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/io.github.985892345/NetLayout?server=https://s01.oss.sonatype.org&label=SNAPSHOT)
 
  一个功能更全面的网状布局
 
